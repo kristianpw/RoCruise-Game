@@ -1,0 +1,57 @@
+local spout = script.Parent.Part1
+local tool = script.Parent
+local foam = game.ReplicatedStorage.firefoam
+local active = false
+local UIS = game:GetService("UserInputService")
+local runservice = game:GetService("RunService")
+local sprayfunc
+local connection
+local lastfoam = 0
+local interval = 0.1
+
+local function spray()
+	active = true
+	connection = runservice.Heartbeat:Connect(function()
+		if not active then
+			connection:Disconnect()
+			return
+		end
+		
+		local currenttime = tick()
+		if currenttime - lastfoam >= interval then
+			lastfoam = currenttime
+			
+			local foamclone = foam:Clone()
+			foamclone.CFrame = spout.CFrame
+			local rightVector = spout.CFrame.LookVector:Cross(Vector3.new(0, 1, 0)).Unit
+
+			local randomHorizontal = math.rad(math.random(-20, 20)) -- Random horizontal angle
+			local randomVertical = math.rad(math.random(-20, 20)) -- Random vertical angle
+			local spreadCFrame = CFrame.Angles(randomVertical, randomHorizontal, 0)
+			local spreadVector = (spreadCFrame * spout.CFrame.LookVector).Unit
+
+			local bodyVelocity = Instance.new("BodyVelocity")
+			bodyVelocity.Velocity = spreadVector * 15
+			bodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+			bodyVelocity.Parent = foamclone
+
+			foamclone.Parent = game.Workspace
+			game.Debris:AddItem(foamclone, 2)
+		end
+	end)
+end
+
+local function stopspray()
+	active = false
+	if connection then
+		connection:Disconnect()
+	end
+end
+
+local function onequip()
+	tool.Activated:Connect(spray)
+	tool.Deactivated:Connect(stopspray)
+end
+
+tool.Equipped:Connect(onequip)
+tool.Unequipped:Connect(stopspray)

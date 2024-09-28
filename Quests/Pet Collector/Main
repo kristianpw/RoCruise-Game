@@ -1,0 +1,61 @@
+local detector = script.Parent.ClickDetector
+local event = game.ReplicatedStorage:FindFirstChild("messagegui")
+local message1 = "At least there's good food while we're stationed on this barren planet."
+local lastclicked
+
+local messages = {
+	"Are you interested in a quest? Collect 6 pets for me to earn the rare Catseye.",
+	"The first pet I need is the Boulder pet found on planet Cree.",
+	"Good job on Cree. The next pet is the Cracked Egg found on the icy planet Boreas.",
+	"Excellent job on Boreas. The next pet is the Bomb found on the fiery planet Skiron.",
+	"You're getting closer. The next pet is the found Emerald Eye in the flower fields Cree.",
+	"You're almost finished. This next pet is the Gygax found deep within the caves of Boreas.",
+	"Fantastic! Just one more pet and the Catseye is yours. The last pet is Eerie found underneath the volcano of Skiron.",
+	"But be careful. Skiron is home to the dangerous Drakkobloxxers...",
+	"Congrats! You collected all the pets and as your reward, you've earned the Crimson Catseye.",
+	"Enjoy your new pet."
+}
+
+local function clicked(clicker)
+	if lastclicked ~= clicker.Name then
+		local player = game.Players:FindFirstChild(clicker.Name)
+		local questprogress = player.Missions:FindFirstChild("CatseyeQuest")
+		if questprogress then
+			lastclicked = clicker.Name
+			if questprogress.Value == 0 then
+				event:FireClient(clicker, messages[1])
+				task.wait(4.3)
+				event:FireClient(clicker, messages[2])
+			elseif questprogress.Value == 1 then
+				event:FireClient(clicker, messages[3])
+			elseif questprogress.Value == 2 then
+				event:FireClient(clicker, messages[4])
+			elseif questprogress.Value == 3 then
+				event:FireClient(clicker, messages[5])
+			elseif questprogress.Value == 4 then
+				event:FireClient(clicker, messages[6])
+			elseif questprogress.Value == 5 then
+				event:FireClient(clicker, messages[7])
+				task.wait(4.3)
+				event:FireClient(clicker, messages[8])
+			elseif questprogress.Value == 6 then
+				local catseye = player:FindFirstChild("Pets"):FindFirstChild("Pet13")
+				if catseye.Value == 0 then
+					local queststat = game.Players:FindFirstChild(clicker.Name).PlayerStats.Quests
+					queststat.Value += 1
+					local petstat = game.Players:FindFirstChild(clicker.Name).PlayerStats.PetsOwned
+					petstat.Value += 1
+					event:FireClient(clicker, messages[9])
+					catseye.Value = 1
+				else
+					event:FireClient(clicker, messages[10])
+				end
+			end
+			task.wait(4)
+			lastclicked = nil
+		end
+	end
+end
+
+detector.MouseClick:Connect(clicked)
+

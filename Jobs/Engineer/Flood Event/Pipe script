@@ -1,0 +1,50 @@
+--Serverside script to prevent cheating
+
+local pipefixed = game.ReplicatedStorage.pipefixed
+
+local holes = {
+	{Name = "hole1hitbox", pipe = "hole1", hole = game.Workspace.engineerevent.hole1},
+	{Name = "hole2hitbox", pipe = "hole2",hole = game.Workspace.engineerevent.hole2},
+	{Name = "hole3hitbox", pipe = "hole3",hole = game.Workspace.engineerevent.hole3},
+	{Name = "hole4hitbox", pipe = "hole4",hole = game.Workspace.engineerevent.hole4},
+	{Name = "hole5hitbox", pipe = "hole5",hole = game.Workspace.engineerevent.hole5},
+	{Name = "hole6hitbox", pipe = "hole6",hole = game.Workspace.engineerevent.hole6},
+	{Name = "hole7hitbox", pipe = "hole7",hole = game.Workspace.engineerevent.hole7},
+	{Name = "hole8hitbox", pipe = "hole8",hole = game.Workspace.engineerevent.hole8},
+	{Name = "hole9hitbox", pipe = "hole9",hole = game.Workspace.engineerevent.hole9},
+	{Name = "hole10hitbox", pipe = "hole10",hole = game.Workspace.engineerevent.hole10},
+	{Name = "hole11hitbox", pipe = "hole11",hole = game.Workspace.engineerevent.hole11},
+	{Name = "hole12hitbox", pipe = "hole12",hole = game.Workspace.engineerevent.hole12},
+}
+
+pipefixed.OnServerEvent:Connect(function(player, part)
+	if part then
+		for _, hole in ipairs(holes) do
+			if part.Name == hole.Name then
+				local holeinworkspace = game.Workspace.engineerevent:FindFirstChild(hole.pipe)
+				local fixed = holeinworkspace:FindFirstChild("fixed")
+				local holesfixed = game.Workspace.engineerevent:FindFirstChild("holesfixed")
+				if fixed.Value > 1 then
+					fixed.Value = fixed.Value - 1
+					holesfixed.Value = holesfixed.Value + 1
+					local playerCash = player.leaderstats.Cash
+					playerCash.Value = playerCash.Value + 5
+					local cashstat = player.PlayerStats.MoneyEarned
+					cashstat.Value += 5
+				elseif fixed.Value == 1 then
+					fixed.Value = fixed.Value - 1
+					holesfixed.Value = holesfixed.Value + 1
+					local playerCash = player.leaderstats.Cash
+					playerCash.Value = playerCash.Value + 5
+					local cashstat = player.PlayerStats.MoneyEarned
+					cashstat.Value += 5
+					local holestat = player.PlayerStats.HolesFixed
+					holestat.Value += 1
+				end
+				break
+			end
+		end
+	else
+		warn("Part is nil")
+	end
+end)

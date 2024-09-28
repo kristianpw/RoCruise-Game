@@ -1,0 +1,35 @@
+amnt = 5
+local debounce = false
+
+function onTouched(part)
+	local h = part.Parent:findFirstChild("Humanoid")
+	if (h~=nil) and debounce == false then
+		debounce = true
+		local thisplr = game.Players:findFirstChild(h.Parent.Name)
+		if (thisplr~=nil) then
+			local stats = thisplr:findFirstChild("leaderstats")
+			if (stats~=nil) then
+				local score = stats:findFirstChild("Cash")
+				local jobstat = thisplr:FindFirstChild("PlayerStats"):FindFirstChild("ChefJob")
+				if (score~=nil) then
+					local owner = script.Parent.Owner
+					if owner.Value == thisplr.Name then
+						score.Value = score.Value + amnt
+						jobstat.Value += 1
+						local moneystat = thisplr.PlayerStats.MoneyEarned
+						moneystat.Value += amnt
+						wait()
+						script.Parent:remove()
+						debounce = false
+					else
+						task.wait(0.1)
+						debounce = false
+						return
+					end
+				end
+			end
+		end
+	end
+end
+
+script.Parent.Touched:connect(onTouched)

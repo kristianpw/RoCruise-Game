@@ -1,0 +1,289 @@
+local cam = game.Workspace.CurrentCamera
+local petcam = game.Workspace.petshopinterface.petcam
+local petshop = game.ReplicatedStorage.petshop
+local petshopinterface = game.Workspace.petshopinterface
+local petshopdetect = petshopinterface.petshopdetector.ClickDetector
+local petshoppets = game.Workspace.petshopinterface.pets
+local buybutton = petshopinterface.buybutton
+local selectbutton = petshopinterface.selectbutton
+local leftbutton = petshopinterface.left.ClickDetector
+local rightbutton = petshopinterface.right.ClickDetector
+local xbutton = petshopinterface.X.ClickDetector
+local rightClickConnection
+local leftClickConnection
+local xClickConnection
+local buyClickConnection
+local selectClickConnection
+local player = game.Players.LocalPlayer
+local playergui = player.PlayerGui
+local buypetremote = game.ReplicatedStorage:FindFirstChild("buypet")    --BuyPet in ServerScriptService
+local selectremote = game.ReplicatedStorage:FindFirstChild("selectpet") --BuyPet in ServerScriptService
+local defaultselectpos = selectbutton.PrimaryPart.Position
+local defaultbuypos = selectbutton.PrimaryPart.Position
+local petprice
+local petmesh
+local buybackup
+local selectbackup
+local selectbuttonactive = false
+local buybuttonactive = false
+
+local nonbuyablepets = {9,10,11,12,13,14}
+
+local pets = {}
+
+local currentindex = 1
+
+local function showpet(index)
+	for i, petinfo in ipairs(pets) do
+		if i == index then
+			if petprice then
+				petprice:Destroy()
+			end
+			petprice = Instance.new("Hint")
+			petprice.Text = pets[i].display
+			petprice.Parent = playergui
+			
+			
+			local petcheck = player.Pets:FindFirstChild(petinfo.Name)
+			if petcheck.Value == 1 then								--Player owns pet, turn on select button
+				selectbutton.click.ClickDetector.MaxActivationDistance = 40
+				for i, v in pairs(selectbutton:GetChildren()) do
+					if v:IsA('BasePart') then
+						if v:FindFirstChild("Decal") then
+							v:FindFirstChild("Decal").Transparency = 0
+						end
+					end
+				end
+				
+				if selectbuttonactive == false then
+					selectbuttonactive = true
+					
+					--Move select button in front of buy button
+					local newselectpos = Vector3.new(475.45, 488.5, 511)
+					selectbutton:SetPrimaryPartCFrame(CFrame.new(newselectpos))
+					
+					--Move buy button to default position
+					buybutton:SetPrimaryPartCFrame(CFrame.new(defaultbuypos))
+					
+					buybuttonactive = false
+				end
+				
+				buybutton.click.ClickDetector.MaxActivationDistance = 0 --Turn off buy button
+				for i, v in pairs(buybutton:GetChildren()) do
+					if v:IsA('BasePart') then
+						if v:FindFirstChild("Decal") then
+							v:FindFirstChild("Decal").Transparency = 1
+						end
+					end
+				end
+			else														--Player doesn't own pet, turn on buy button
+				if table.find(nonbuyablepets, i) then
+					buybutton.click.ClickDetector.MaxActivationDistance = 0 --Turn off buy button
+					for i, v in pairs(buybutton:GetChildren()) do
+						if v:IsA('BasePart') then
+							if v:FindFirstChild("Decal") then
+								v:FindFirstChild("Decal").Transparency = 1
+							end
+						end
+					end
+				else
+					buybutton.click.ClickDetector.MaxActivationDistance = 40
+					for i, v in pairs(buybutton:GetChildren()) do
+						if v:IsA('BasePart') then
+							if v:FindFirstChild("Decal") then
+								v:FindFirstChild("Decal").Transparency = 0
+							end
+						end
+					end
+
+					if buybuttonactive == false then
+						buybuttonactive = true
+
+						--Move buy button in front of select button
+						local newbuypos = Vector3.new(475.45, 488.5, 511)
+						buybutton:SetPrimaryPartCFrame(CFrame.new(newbuypos))
+
+						--Move select button to default position
+						selectbutton:SetPrimaryPartCFrame(CFrame.new(defaultselectpos))
+
+						selectbuttonactive = false
+					end
+				end
+				
+				--Turn off select button
+				selectbutton.click.ClickDetector.MaxActivationDistance = 0
+				for i, v in pairs(selectbutton:GetChildren()) do
+					if v:IsA('BasePart') then
+						if v:FindFirstChild("Decal") then
+							v:FindFirstChild("Decal").Transparency = 1
+						end
+					end
+				end
+			end
+			
+			--Makes current pet visible
+			if petinfo.pet.Name == "Pet7" then
+				for i, v in pairs(petinfo.pet:GetChildren()) do
+					if v:IsA('Decal') then
+						v.Transparency = 0
+					end
+				end
+			else
+				petinfo.pet.Transparency = 0
+			end
+		else
+			if petinfo.pet.Name == "Pet7" then
+				for i, v in pairs(petinfo.pet:GetChildren()) do
+					if v:IsA('Decal') then
+						v.Transparency = 1
+					end
+				end
+			else
+				petinfo.pet.Transparency = 1
+			end
+		end
+	end
+end
+
+local function leftclick()
+	currentindex = currentindex - 1
+	if currentindex < 1 then
+		currentindex = #pets
+	end
+	showpet(currentindex)
+end
+
+local function rightclick()
+	currentindex = currentindex + 1
+	if currentindex > #pets then
+		currentindex = 1
+	end
+	showpet(currentindex)
+end
+
+local function xclick()
+	--Reset Players Cam
+	cam.CameraType = Enum.CameraType.Custom
+	game.Workspace:FindFirstChild(player.Name).Humanoid.WalkSpeed = 16
+	
+	--Turn off all buttons
+	leftbutton.MaxActivationDistance = 0
+	rightbutton.MaxActivationDistance = 0
+	xbutton.MaxActivationDistance = 0
+	leftbutton.Parent.Decal.Transparency = 1
+	rightbutton.Parent.Decal.Transparency = 1
+	xbutton.Parent.Decal.Transparency = 1
+	petshopdetect.MaxActivationDistance = 20
+	selectbutton.click.ClickDetector.MaxActivationDistance = 0
+	buybutton.click.ClickDetector.MaxActivationDistance = 0
+	if petprice then
+		petprice:Destroy()
+	end
+	
+	--turn all pet models invisible
+	for i, petinfo in ipairs(pets) do
+		if i == currentindex then
+			if petinfo.pet.Name == "Pet7" then
+				for i, v in pairs(petinfo.pet:GetChildren()) do
+					if v:IsA('Decal') then
+						v.Transparency = 1
+					end
+				end
+			else
+				petinfo.pet.Transparency = 1
+			end
+		end
+	end
+	
+	--turn select/buy button invisible
+	for i, v in pairs(selectbutton:GetChildren()) do
+		if v:IsA('BasePart') then
+			if v:FindFirstChild("Decal") then
+				v:FindFirstChild("Decal").Transparency = 1
+			end
+		end
+	end
+	for i, v in pairs(buybutton:GetChildren()) do
+		if v:IsA('BasePart') then
+			if v:FindFirstChild("Decal") then
+				v:FindFirstChild("Decal").Transparency = 1
+			end
+		end
+	end
+	
+	--reset index
+	currentindex = 1
+end
+
+local function buyclick()
+	local pet2buy = pets[currentindex].Name
+	buypetremote:FireServer(pet2buy)
+	local playercash = player.leaderstats.Cash
+	local petprice2 = tonumber(pets[currentindex].price)
+	if playercash.Value >= petprice2 then
+		if petprice then
+			petprice:Destroy()
+		end
+		petprice = Instance.new("Hint")
+		petprice.Text = "Purchase Successful."
+		petprice.Parent = playergui
+	end
+end
+
+local function selectclick()
+	local pet2select = pets[currentindex].Name
+	selectremote:FireServer(pet2select)
+	if petprice then
+		petprice:Destroy()
+	end
+	petprice = Instance.new("Hint")
+	petprice.Text = "Current pet selected."
+	petprice.Parent = playergui
+end
+
+petshop.OnClientEvent:Connect(function()
+	cam.CameraType = Enum.CameraType.Scriptable
+	cam.CFrame = petcam.CFrame
+	game.Workspace:FindFirstChild(player.Name).Humanoid.WalkSpeed = 0
+	leftbutton.MaxActivationDistance = 40
+	rightbutton.MaxActivationDistance = 40
+	xbutton.MaxActivationDistance = 40
+	leftbutton.Parent.Decal.Transparency = 0
+	rightbutton.Parent.Decal.Transparency = 0
+	petshopdetect.MaxActivationDistance = 0
+	xbutton.Parent.Decal.Transparency = 0
+	
+	pets = {
+		{Name = "Pet1", pet = petshoppets:FindFirstChild("Pet1"), price = "300", display = "Price: 300"},
+		{Name = "Pet2", pet = petshoppets:FindFirstChild("Pet2"), price = "300", display = "Price: 300"},
+		{Name = "Pet3", pet = petshoppets:FindFirstChild("Pet3"), price = "600", display = "Price: 600"},
+		{Name = "Pet4", pet = petshoppets:FindFirstChild("Pet4"), price = "600", display = "Price: 600"},
+		{Name = "Pet5", pet = petshoppets:FindFirstChild("Pet5"), price = "1000", display = "Price: 1000"},
+		{Name = "Pet6", pet = petshoppets:FindFirstChild("Pet6"), price = "1000", display = "Price: 1000"},
+		{Name = "Pet7", pet = petshoppets:FindFirstChild("Pet7"), price = "2000", display = "Price: 2000"},
+		{Name = "Pet8", pet = petshoppets:FindFirstChild("Pet8"), price = "4000", display = "Price: 4000"},
+		{Name = "Pet9", pet = petshoppets:FindFirstChild("Pet9"), display = "Secret Pet"},
+		{Name = "Pet10", pet = petshoppets:FindFirstChild("Pet10"), display = "Secret Pet"},
+		{Name = "Pet11", pet = petshoppets:FindFirstChild("Pet11"), display = "Secret Pet"},
+		{Name = "Pet12", pet = petshoppets:FindFirstChild("Pet12"), display = "Secret Pet"},
+		{Name = "Pet13", pet = petshoppets:FindFirstChild("Pet13"), display = "Quest Pet"},
+		{Name = "Pet14", pet = petshoppets:FindFirstChild("Pet14"), display = "VIP Exclusive Pet"},
+	}
+	
+	-- Disconnect existing connections if they exist
+	if rightClickConnection then rightClickConnection:Disconnect() end
+	if leftClickConnection then leftClickConnection:Disconnect() end
+	if xClickConnection then xClickConnection:Disconnect() end
+	if buyClickConnection then buyClickConnection:Disconnect() end
+	if selectClickConnection then selectClickConnection:Disconnect() end
+
+	-- Set up new connections
+	rightClickConnection = rightbutton.MouseClick:Connect(rightclick)
+	leftClickConnection = leftbutton.MouseClick:Connect(leftclick)
+	xClickConnection = xbutton.MouseClick:Connect(xclick)
+	buyClickConnection = buybutton.click.ClickDetector.MouseClick:Connect(buyclick)
+	selectClickConnection = selectbutton.click.ClickDetector.MouseClick:Connect(selectclick)
+	
+	showpet(currentindex)
+end)
+

@@ -1,0 +1,168 @@
+local model = script.Parent
+local redbutton = model.redbutton
+local blackbutton = model.blackbutton
+local ball = game.ReplicatedStorage.rouletteball
+local ballspawn = model.ballspawner
+local event = game.ReplicatedStorage:FindFirstChild("messagegui") --StarterGui > MessageGui > LocalScript
+local message1 = "You won $17!"
+local message2 = "You lost."
+local message3 = "Ball lost. Refunding money."
+local debounce = false
+local ballfunc
+local ballcheck
+local gamblingval
+local ballnumber = 1
+
+
+local function redbuttonfunc(clicker)
+		if debounce == false then
+			debounce = true
+				local player = clicker.Name
+				local playercash = game.Players:FindFirstChild(player).leaderstats.Cash
+				local playergui = game.Players:FindFirstChild(player).PlayerGui
+				if playercash then
+					gamblingval = game.Players:FindFirstChild(player):FindFirstChild("gamblingval")
+					if gamblingval and gamblingval.Value == 0 then --player is not currently gambling
+						if playercash.Value > 4 then
+							redbutton.Color = Color3.fromRGB(15, 15, 15)
+							gamblingval.Value = 1
+							playercash.Value = playercash.Value - 5
+							local ballclone = ball:Clone()
+							local moneyspent = game.Players:FindFirstChild(player).PlayerStats.MoneySpent
+							moneyspent.Value += 5
+							local moneygambled = game.Players:FindFirstChild(player).PlayerStats.MoneyGambled
+							moneygambled.Value += 5
+							ballclone.Position = ballspawn.Position
+							ballclone.Name = player.."'sballred"..ballnumber
+							ballnumber = ballnumber + 1
+							ballclone.Parent = model
+							ballfunc = ballclone.Touched:Connect(function(part)
+								if part ~= nil then
+									if part.Name == "red" then --ball touched red, player wins
+										event:FireClient(clicker, message1)
+										playercash.Value += 17
+										local moneywon = game.Players:FindFirstChild(player).PlayerStats.MoneyWon
+										moneywon.Value += 17
+										ballclone:Destroy()
+										task.wait(1)
+										redbutton.Color = Color3.fromRGB(196, 40, 28)
+										debounce = false
+										gamblingval.Value = 0
+										task.wait(2)
+										ballcheck = nil
+										return
+									elseif part.Name == "black" then --ball touched black, player loses
+										event:FireClient(clicker, message2)
+										ballclone:Destroy()
+										task.wait(1)
+										redbutton.Color = Color3.fromRGB(196, 40, 28)
+										debounce = false
+										gamblingval.Value = 0
+										task.wait(2)
+										ballcheck = nil
+										return
+									else
+										task.wait(0.1)
+									end
+								end
+								task.wait(30)
+								local ballcheck = model:FindFirstChild(player.."'sballred"..ballnumber)
+								if ballcheck then --if ball still exists after 30 seconds, destroy and refund player
+									event:FireClient(clicker, message3)
+									ballclone:Destroy()
+									ballfunc:Disconnect()
+									playercash.Value = playercash.Value + 5
+									task.wait(1)
+									redbutton.Color = Color3.fromRGB(196, 40, 28)
+									debounce = false
+									gamblingval.Value = 0
+									task.wait(2)
+									ballcheck = nil
+									return
+								end
+							end)
+						end
+					end
+				end
+			end
+					
+	debounce = false
+end
+
+local function blackbuttonfunc(clicker)
+		if debounce == false then
+			debounce = true
+				local player = clicker.Name
+				local playercash = game.Players:FindFirstChild(player).leaderstats.Cash
+				local playergui = game.Players:FindFirstChild(player).PlayerGui
+				if playercash then
+					gamblingval = game.Players:FindFirstChild(player):FindFirstChild("gamblingval")
+					if gamblingval and gamblingval.Value == 0 then --player is not currently gambling
+						if playercash.Value > 4 then
+							blackbutton.Color = Color3.fromRGB(15, 15, 15)
+							gamblingval.Value = 1
+							playercash.Value = playercash.Value - 5
+							local moneyspent = game.Players:FindFirstChild(player).PlayerStats.MoneySpent
+							moneyspent.Value += 5
+							local moneygambled = game.Players:FindFirstChild(player).PlayerStats.MoneyGambled
+							moneygambled.Value += 5
+							local ballclone = ball:Clone()
+							ballclone.Position = ballspawn.Position
+							ballclone.Name = player.."'sballblack"..ballnumber
+							print(ballclone.Name)
+							ballnumber = ballnumber + 1
+							ballclone.Parent = model
+							ballfunc = ballclone.Touched:Connect(function(part)
+								if part ~= nil then
+									if part.Name == "black" then --ball touched black, player wins
+										event:FireClient(clicker, message1)
+										playercash.Value += 17
+										local moneywon = game.Players:FindFirstChild(player).PlayerStats.MoneyWon
+										moneywon.Value += 17
+										ballclone:Destroy()
+										task.wait(1)
+										blackbutton.Color = Color3.fromRGB(27, 42, 53)
+										debounce = false
+										gamblingval.Value = 0
+										task.wait(2)
+										ballcheck = nil
+										return
+								elseif part.Name == "red" then --ball touched red, player loses
+										event:FireClient(clicker, message2)
+										ballclone:Destroy()
+										task.wait(1)
+										blackbutton.Color = Color3.fromRGB(27, 42, 53)
+										debounce = false
+										gamblingval.Value = 0
+										task.wait(2)
+										ballcheck = nil
+										return
+									else
+										task.wait()
+									end
+								end
+								task.wait(30)
+								local ballcheck = model:FindFirstChild(player.."'sballred"..ballnumber)
+								if ballcheck then --if ball still exists after 30 seconds, destroy and refund player
+									event:FireClient(clicker, message3)
+									ballclone:Destroy()
+									ballfunc:Disconnect()
+									playercash.Value = playercash.Value + 5
+									task.wait(1)
+									blackbutton.Color = Color3.fromRGB(27, 42, 53)
+									debounce = false
+									gamblingval.Value = 0
+									task.wait(2)
+									ballcheck = nil
+									return
+								end
+							end)
+						end
+					end
+				end
+		end
+	debounce = false
+end
+
+redbutton.ClickDetector.MouseClick:Connect(redbuttonfunc)
+blackbutton.ClickDetector.MouseClick:Connect(blackbuttonfunc)

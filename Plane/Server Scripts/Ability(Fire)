@@ -1,0 +1,100 @@
+local wep0fired = game.ReplicatedStorage:FindFirstChild("Wep0Fired")
+local wep1fired = game.ReplicatedStorage:FindFirstChild("Wep1Fired")
+local wep2fired = game.ReplicatedStorage:FindFirstChild("Wep2Fired")
+local wep3fired = game.ReplicatedStorage:FindFirstChild("Wep3Fired")
+local speed = 200
+
+local lifetime = 30
+
+local function firewep3(player, flameshoot1, flameshoot2)
+	local player = player
+	local flameshoot1 = flameshoot1
+	local flameshoot2 = flameshoot2
+	print(flameshoot1)
+	print("serverside firing")
+	local flameshoot1clone = flameshoot1:Clone()
+	flameshoot1clone.Name = "flameshoot1clone"
+	flameshoot1clone.LinearVelocity.MaxForce = math.huge
+	flameshoot1clone.LinearVelocity.VectorVelocity = flameshoot1.CFrame.LookVector * speed
+	flameshoot1clone.Transparency = 0
+	flameshoot1clone.Parent = game.Workspace
+	game.Debris:AddItem(flameshoot1clone, lifetime)
+	local flameshoot2clone = flameshoot2:Clone()
+	flameshoot2clone.Name = "flameshoot2clone"
+	flameshoot2clone.LinearVelocity.MaxForce = math.huge
+	flameshoot2clone.LinearVelocity.VectorVelocity = flameshoot2.CFrame.LookVector * speed
+	flameshoot2clone.Transparency = 0
+	flameshoot2clone.Parent = game.Workspace
+	game.Debris:AddItem(flameshoot2clone, lifetime)
+end
+
+local function firewep2(player, sparkleshoot1, sparkleshoot2)
+	local player = player
+	local sparkleshoot1 = sparkleshoot1
+	local sparkleshoot2 = sparkleshoot2
+	print(sparkleshoot1)
+	print("serverside firing")
+	local sparkleshoot1clone = sparkleshoot1:Clone()
+	sparkleshoot1clone.Name = "sparkleshoot1clone"
+	sparkleshoot1clone.LinearVelocity.MaxForce = math.huge
+	sparkleshoot1clone.LinearVelocity.VectorVelocity = sparkleshoot1.CFrame.LookVector * speed
+	sparkleshoot1clone.Sparkles.Enabled = true
+	sparkleshoot1clone.Parent = game.Workspace
+	game.Debris:AddItem(sparkleshoot1clone, lifetime)
+	local sparkleshoot2clone = sparkleshoot2:Clone()
+	sparkleshoot2clone.Name = "sparkleshoot2clone"
+	sparkleshoot2clone.LinearVelocity.MaxForce = math.huge
+	sparkleshoot2clone.LinearVelocity.VectorVelocity = sparkleshoot2.CFrame.LookVector * speed
+	sparkleshoot2clone.Sparkles.Enabled = true
+	sparkleshoot2clone.Parent = game.Workspace
+	game.Debris:AddItem(sparkleshoot2clone, lifetime)
+end
+
+local function firewep1(player, diamantshoot1, diamantshoot2)
+	local player = player
+	local diamantshoot1 = diamantshoot1
+	local diamantshoot2 = diamantshoot2
+	print(diamantshoot1)
+	print("serverside firing")
+	local diamantshoot1clone = diamantshoot1:Clone()
+	diamantshoot1clone.Name = "diamantshoot1clone"
+	diamantshoot1clone.LinearVelocity.MaxForce = math.huge
+	diamantshoot1clone.LinearVelocity.VectorVelocity = diamantshoot1.CFrame.LookVector * speed
+	diamantshoot1clone.Transparency = 0
+	diamantshoot1clone.Parent = game.Workspace
+	game.Debris:AddItem(diamantshoot1clone, lifetime)
+	local diamantshoot2clone = diamantshoot2:Clone()
+	diamantshoot2clone.Name = "diamantshoot2clone"
+	diamantshoot2clone.LinearVelocity.MaxForce = math.huge
+	diamantshoot2clone.LinearVelocity.VectorVelocity = diamantshoot2.CFrame.LookVector * speed
+	diamantshoot2clone.Transparency = 0
+	diamantshoot2clone.Parent = game.Workspace
+	game.Debris:AddItem(diamantshoot2clone, lifetime)
+end
+
+local function firewep0(player, baseshoot1, baseshoot2)
+	local player = player
+	local baseshoot1 = baseshoot1
+	local baseshoot2 = baseshoot2
+	print(baseshoot1)
+	print("serverside firing")
+	local baseshoot1clone = baseshoot1:Clone()
+	baseshoot1clone.Name = "baseshoot1clone"
+	baseshoot1clone.LinearVelocity.MaxForce = math.huge
+	baseshoot1clone.LinearVelocity.VectorVelocity = baseshoot1.CFrame.LookVector * 150
+	baseshoot1clone.Transparency = 0
+	baseshoot1clone.Parent = game.Workspace
+	game.Debris:AddItem(baseshoot1clone, lifetime)
+	local baseshoot2clone = baseshoot2:Clone()
+	baseshoot2clone.Name = "baseshoot2clone"
+	baseshoot2clone.LinearVelocity.MaxForce = math.huge
+	baseshoot2clone.LinearVelocity.VectorVelocity = baseshoot2.CFrame.LookVector * 150
+	baseshoot2clone.Transparency = 0
+	baseshoot2clone.Parent = game.Workspace
+	game.Debris:AddItem(baseshoot2clone, lifetime)
+end
+
+wep3fired.OnServerEvent:Connect(firewep3)
+wep2fired.OnServerEvent:Connect(firewep2)
+wep1fired.OnServerEvent:Connect(firewep1)
+wep0fired.OnServerEvent:Connect(firewep0)

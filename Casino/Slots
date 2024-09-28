@@ -1,0 +1,196 @@
+local player
+local playerstats
+local localplayer
+local event = game.ReplicatedStorage:FindFirstChild("messagegui") --StarterGui > MessageGui > LocalScript
+local message2 = "You won $100!"
+local message3 = "You won $10!"
+local message4 = "You won $6!"
+local msg
+local gamblingval
+amnt = 2  --COST TO PLAY
+hold = false
+bin = script.Parent
+
+light = bin.Light
+button = bin.Button
+dig1 = bin.Digit1
+dig2 = bin.Digit2
+dig3 = bin.Digit3
+
+color1 = 0
+color2 = 0
+color3 = 0
+
+local function Roll(cash)
+	for i=1, 10 do
+		--ROLL FIRST
+		color1 = math.random(0,10)
+		dig1.Color = GetColor(color1)
+		dig1.TopParamA = -1
+		dig1.TopParamA = 1
+		--ROLLSECOND
+		color2 = math.random(0,10)
+		dig2.Color = GetColor(color2)
+		dig2.TopParamA = -1
+		dig2.TopParamA = 1
+		dig1.TopParamA = -0
+		dig1.TopParamA = 0
+		--ROLL THIRD
+		color3 = math.random(0,10)
+		dig3.Color = GetColor(color3)
+		dig3.TopParamA = -1
+		dig3.TopParamA = 1
+		dig2.TopParamA = -0
+		dig2.TopParamA = 0
+		wait(0.1)
+		dig3.TopParamA = -0
+		dig3.TopParamA = 0
+	end
+	for i=1, 10 do
+		--ROLLSECOND
+		color2 = math.random(0,10)
+		dig2.Color = GetColor(color2)
+		--ROLL THIRD
+		color3 = math.random(0,10)
+		dig3.Color = GetColor(color3)
+		wait(0.1)
+	end
+	for i=1, 10 do
+		--ROLL THIRD
+		color3 = math.random(0,10)
+		dig3.Color = GetColor(color3)
+		wait(0.1)
+	end
+
+
+	--all 3 colors match specific color (jackpot) (0.075%)
+	
+	if (color1==0 and color2==0 and color3==0) then
+		cash.Value += 1000
+		local moneywon = game.Players:FindFirstChild(player).PlayerStats.MoneyWon
+		moneywon.Value += 1000
+		msg=Instance.new("Message")
+		msg.Parent= game.Workspace
+		msg.Text= player.." won $1000 cash!!!"
+		lights()
+		task.wait(3)
+		msg:remove()
+	
+	
+	--all 3 colors match(and isnt the jackpot) (0.75%)
+	
+	elseif (color1==color2 and color2==color3) and color1 ~= 0 then
+		cash.Value += 100
+		local moneywon = game.Players:FindFirstChild(player).PlayerStats.MoneyWon
+		moneywon.Value += 100
+		event:FireClient(localplayer, message2)
+		lights()
+		task.wait(3)
+		
+		
+		--2 colors match next to eachother (17.4%)
+
+	elseif (color1==color2 or color3==color2) then
+		cash.Value += 10
+		local moneywon = game.Players:FindFirstChild(player).PlayerStats.MoneyWon
+		moneywon.Value += 10
+		event:FireClient(localplayer, message3)
+		lights()
+		task.wait(3)
+		
+		
+		--Any 2 colors match (25.6%)
+		
+	elseif (color1==color2) or color2==color3 or color1==color3 then
+		cash.Value += 6
+		local moneywon = game.Players:FindFirstChild(player).PlayerStats.MoneyWon
+		moneywon.Value += 6
+		event:FireClient(localplayer, message4)
+		lights()
+		task.wait(3)
+	end
+	gamblingval.Value = 0
+end
+
+local function GetColor(num)
+	if (num==0) then --Black
+		return Color3.new(0,0,0)
+	end
+	if (num==1) then --Grey
+		return Color3.new(.5,.5,.5)
+	end
+	if (num==2) then --White
+		return Color3.new(1,1,1)
+	end
+	if (num==3) then --Red
+		return Color3.new(1,0,0)
+	end
+	if (num==4) then --Green
+		return Color3.new(0,1,0)
+	end
+	if (num==5) then --Blue
+		return Color3.new(0,0,1)
+	end
+	return Color3.new(GetRand(),GetRand(),GetRand())
+end
+
+local function GetRand()
+	return (math.random(1,10)/10)
+end
+
+local function lights()
+    light.Reflectance= 1
+    wait(.3)
+    light.Reflectance= .5
+    wait(.3)
+    light.Reflectance= 1
+    wait(.3)
+    light.Reflectance= .5
+    wait(.3)
+    light.Reflectance= 1
+    wait(.3)
+    light.Reflectance= .5
+    wait(.3)
+    light.Reflectance= 1
+    wait(.3)
+    light.Reflectance= .5
+    wait(.3)
+    light.Reflectance= 1
+    wait(.3)
+    light.Reflectance= .2
+    wait(.3)
+end
+
+local function onTouched(clicker)
+	localplayer = clicker
+	player = clicker.Name
+	playerstats = game.Players:FindFirstChild(clicker.Name)
+	if hold == false then
+		hold=true
+		if playerstats ~= nil then
+			local stats = playerstats:findFirstChild("leaderstats")
+			if (stats~=nil) then
+				local score = stats:findFirstChild("Cash")
+				if (score~=nil) then
+					gamblingval = game.Players:FindFirstChild(player):FindFirstChild("gamblingval")
+					if gamblingval and gamblingval.Value == 0 then --is player currently gambling
+						if (score.Value >= amnt) then
+							button.Color = Color3.new(0,0,0)
+							gamblingval.Value = 1
+							score.Value = score.Value - amnt
+							local moneyspent = game.Players:FindFirstChild(player).PlayerStats.MoneySpent
+							moneyspent.Value += 2
+							local moneygambled = game.Players:FindFirstChild(player).PlayerStats.MoneyGambled
+							moneygambled.Value += 2
+							Roll(score)
+						end
+					end
+				end
+			end
+		end
+		button.Color = Color3.fromRGB(40, 127, 71)
+		hold=false
+	end
+end
+
+button.ClickDetector.MouseClick:connect(onTouched)

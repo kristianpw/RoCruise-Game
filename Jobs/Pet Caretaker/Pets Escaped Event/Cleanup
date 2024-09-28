@@ -1,0 +1,38 @@
+local model = script.Parent
+local petscoll = model:FindFirstChild("petscollected")
+local event = model:FindFirstChild("event")
+
+
+event.Changed:Connect(function()
+	if event.Value == 1 then
+		task.wait(60)
+		if petscoll.Value < 8 then --If all pets havent been collected in 60 seconds, delete remaining pets
+			petscoll.Value = 0
+			event.Value = 0
+			if model:FindFirstChild("Pet1") then
+				local pet1 = model:FindFirstChild("Pet1"):Destroy()
+			end
+			if model:FindFirstChild("Pet2") then
+				local pet2 = model:FindFirstChild("Pet2"):Destroy()
+			end
+			if model:FindFirstChild("Pet3") then
+				local pet3 = model:FindFirstChild("Pet3"):Destroy()
+			end
+			if model:FindFirstChild("Pet4") then
+				local pet4 = model:FindFirstChild("Pet4"):Destroy()
+			end
+			if model:FindFirstChild("Pet5") then
+				local pet5 = model:FindFirstChild("Pet5"):Destroy()
+			end
+			if model:FindFirstChild("Pet6") then
+				local pet6 = model:FindFirstChild("Pet6"):Destroy()
+			end
+			if model:FindFirstChild("Pet7") then
+				local pet7 = model:FindFirstChild("Pet7"):Destroy()
+			end
+			if model:FindFirstChild("Pet8") then
+				local pet8 = model:FindFirstChild("Pet8"):Destroy()
+			end
+		end
+	end
+end)

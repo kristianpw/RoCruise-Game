@@ -1,0 +1,52 @@
+--Loads players saved data
+
+local datastorageservice = game:GetService("DataStoreService")
+local datastore = datastorageservice:GetDataStore("Player")
+local RepStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local playerjoined = game.ReplicatedStorage:FindFirstChild("PlayerJoined")
+
+local loaded = {}
+
+game.Players.PlayerAdded:Connect(function(player)
+	local success, value = pcall(datastore.GetAsync, datastore, player.UserId)
+	if success == false then player:Kick("Save data failed to load. Please try rejoining later.")
+		return
+	end
+	local data = value or {}
+	print("Loaded", data)
+	for i, folder in game.ServerStorage.PlayerData:GetChildren() do
+		local subdata = data[folder.Name] or {}
+		local clone = folder:Clone()
+		for i, child in clone:GetChildren() do
+			child.Value = subdata[child.Name] or child.Value
+		end
+		clone.Parent = player
+	end
+	loaded[player] = true
+	playerjoined:Fire(player)
+end)
+
+game.Players.PlayerRemoving:Connect(function(player)
+	if loaded[player] == nil then
+		return
+	end
+	local data = {}
+	for i, folder in game.ServerStorage.PlayerData:GetChildren() do
+		local subdata = {}
+		for i, child in player[folder.Name]:GetChildren() do
+			subdata[child.Name] = child.Value
+		end
+		data[folder.Name] = subdata
+		player[folder.Name]:Destroy()
+	end
+	local success, value = pcall(datastore.SetAsync, datastore, player.UserId, data)
+	print("Saved", data)
+	loaded[player] = nil
+end)
+
+game:BindToClose(function()
+	while next(loaded) ~= nil do
+		task.wait()
+	end
+end)

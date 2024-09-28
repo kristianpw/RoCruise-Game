@@ -1,1 +1,1 @@
-# RoCruise-Game
+RoCruise is coded using Lua on the ROBLOX platform. This is an ongoing project constantly being added to and changed.

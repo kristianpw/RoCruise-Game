@@ -1,0 +1,26 @@
+local event = game.ReplicatedStorage:FindFirstChild("messagegui")
+local player = game.Players.LocalPlayer
+local timer = 0
+local looprunning = false
+
+
+event.OnClientEvent:Connect(function(message)
+	local messagegui = player.PlayerGui:FindFirstChild("MessageGui")
+	if messagegui then
+		timer = 4
+		messagegui.Enabled = false
+		task.wait(0.1)
+		messagegui.Enabled = true
+		messagegui.TextLabel.Text = message
+		if not looprunning then
+			looprunning = true
+			while timer > 0 do
+				task.wait(1)
+				timer -= 1
+			end
+			messagegui.Enabled = false
+			messagegui.TextLabel.Text = ""
+			looprunning = false
+		end	
+	end
+end)

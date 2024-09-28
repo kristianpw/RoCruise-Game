@@ -1,0 +1,841 @@
+local bin = script.Parent
+local player = game.Players.LocalPlayer
+local mouse = player:GetMouse()
+
+local axeremote = game.ReplicatedStorage.GiveAxe
+local food1 = game.ReplicatedStorage.Food1
+local food2 = game.ReplicatedStorage.Food2
+local food3 = game.ReplicatedStorage.Food3
+local roomcolor = game.ReplicatedStorage.roomcolor
+local roomreflect = game.ReplicatedStorage.roomreflect
+local roomtrans = game.ReplicatedStorage.roomtrans
+local roomsurface = game.ReplicatedStorage.roomsurface
+local debounce = false
+local axedebounce = false
+local sodadebounce = false
+local fooddebounce = false
+local mousecon
+--local mouse = player:GetMouse()
+
+
+function onButton1Down(mouse)
+	local playergui = player.PlayerGui:FindFirstChild("MessageGui")
+	local textlabel = playergui:FindFirstChild("TextLabel")
+	local pack = player.Backpack
+	local char = game.Workspace:findFirstChild(player.Name)
+	--mouse.Icon = "rbxasset://textures\\GunWaitCursor.png"
+	local hit = mouse.Target
+	if (hit == nil) then return end
+
+	if hit.Name == "tutorialdoor" and debounce == false then
+		debounce = true
+		local door = hit
+		door.Transparency = 1
+		door.CanCollide = false
+		playergui.Enabled = true
+		textlabel.Text = "Good job!"
+		task.wait(5)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		door.Transparency = 0
+		door.CanCollide = true
+		debounce = false
+	end
+
+if (hit.Parent.Name == "TV") and debounce == false and hit.Transparency ~= 1 then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "Wonder if there's anything on TV."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+
+	if (hit.Name == "CompanionCube") and debounce == false then
+		debounce = true
+		game.Lighting.CompanionCube:clone().Parent = pack
+		playergui.Enabled = true
+		textlabel.Text = "=D a CompanionCube"
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Name == "engineerevent") and debounce == false and hit.Transparency ~= 1 then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "I need to patch these with my hammer!"
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Name == "WallText") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "Click the buttons below to change the look of your rooms walls."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Name == "AirLock") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "I'd need a space helmet to go outside."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Parent.Name == "PachinkoMachine") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "A Pachinko machine. It costs $5 to play."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Parent.Name == "RouletteTable") or (hit.Parent.Parent.Name == "wheel") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "A Roulette table. It costs $5 to play."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Name == "Cakeburnt") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "I'll need to put it out with a fire extinguisher."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Name == "Cheese") and debounce == false and hit.Transparency ~= 1 then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "Looks tasty."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Name == "Cake") and debounce == false and hit.Transparency ~= 1 then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "Looks tasty."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	--Museum
+	
+	if (hit.Parent.Name == "necrobloxicondescription") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "The plaque reads 'An ancient manuscript which is said to have been used to raise armies back from the dead to besiege civilizations and plague the lands."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Name == "HalloweenArt1") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "Spooky..."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Name == "HalloweenArt2") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "An eerie pumpkin patch..."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Name == "HalloweenArt3") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "A witches hat."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Name == "Art1") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "A lovely landscape"
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Name == "Art2") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "It's very... modern."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Name == "Art3") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "I wonder what it's supposed to be."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Name == "catseyedescription") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "The plaque reads 'The rare Crimson Catseye.'"
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Name == "goldenteapot") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "That looks expensive..."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Name == "engineerdoor") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "This is where the pet caretaker job is done."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Name == "generator") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "That's a big generator..."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Name == "shipengine") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "That's the ship's main engine."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Name == "enginepanel") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "The engine's control panel. I better not touch it."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Name == "ExtinguisherGiver") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "I could use this to put out any fires while cooking."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Name == "Teakettle") and debounce == false and hit.Transparency ~= 1 then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "The inferior teapot."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Name == "Teapots") and debounce == false and hit.Transparency ~= 1 then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "Clockwork?"
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Name == "SodaMachine") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		local rng = math.random(1,3)
+		if rng == 1 then
+			textlabel.Text = "A soda machine."
+		elseif rng == 2 then
+			textlabel.Text = "I hope they have bloxy cola..."
+		elseif rng == 3 then
+			textlabel.Text = "It better not steal my quarters..."
+		end
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Name == "XboxModel") or (hit.Parent.Name == "Xbox") and debounce == false and hit.Transparency ~= 1 then
+		debounce = true
+		playergui.Enabled = true
+		local rng = math.random(1,3)
+		if rng == 1 then
+			textlabel.Text = "Is this copyright?"
+		elseif rng == 2 then
+			textlabel.Text = "An Xbox."
+		elseif rng == 3 then
+			textlabel.Text = "I could play Halo..."
+		end
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Name == "WiiModel") or (hit.Parent.Name == "Wii") and debounce == false and hit.Transparency ~= 1 then
+		debounce = true
+		playergui.Enabled = true
+		local rng = math.random(1,3)
+		if rng == 1 then
+			textlabel.Text = "Is this copyright?"
+		elseif rng == 2 then
+			textlabel.Text = "A Wii."
+		elseif rng == 3 then
+			textlabel.Text = "I could play Mario Galaxy..."
+		end
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Name == "PS3Model") or (hit.Parent.Name == "PS3") and debounce == false and hit.Transparency ~= 1 then
+		debounce = true
+		playergui.Enabled = true
+		local rng = math.random(1,3)
+		if rng == 1 then
+			textlabel.Text = "Is this copyright?"
+		elseif rng == 2 then
+			textlabel.Text = "A PS3."
+		elseif rng == 3 then
+			textlabel.Text = "I could play Gears of War..."
+		end
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Parent.Name == "SlotMachine") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		local rng = math.random(1,3)
+		if rng == 1 then
+			textlabel.Text = "Lets go gambling!"
+		elseif rng == 2 then
+			textlabel.Text = "Aw dangit."
+		elseif rng == 3 then
+			textlabel.Text = "A slot machine. It costs 2$ to play."
+		end
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+
+
+	if (hit.Name == "WaterCanGiver") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		if player.Misc.Job.Value == 2 then
+			textlabel.Text = "I can use this water the plants."
+		else
+			textlabel.Text = "I need to be gardener to use that."
+		end
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+
+	if (hit.Name == "Axegiver") and axedebounce == false then
+		axedebounce = true
+		playergui.Enabled = true
+		textlabel.Text = "I can use this axe..."
+		--game.ReplicatedStorage.Axe:clone().Parent = pack
+		axeremote:FireServer(player)
+		task.wait(3)
+		axedebounce = false
+		textlabel.Text = ""
+		playergui.Enabled = false
+	end
+
+	if (hit.Name == "OutOfOrder") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "This is Out of Order"
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+
+	if (hit.Name == "GlassDoor") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "ooo a Glass door"
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+
+	if (hit.Name == "Papers") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "Ughh... Paperwork is boring."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+
+	if (hit.Name == "WarmWater") and debounce == false and (hit.Transparency ~= 0) then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "Warm water."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+
+	if (hit.Name == "Water") and debounce == false and (hit.Transparency ~= 0) then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "Time for a bath."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+
+	if (hit.Name == "ColdWater") and debounce == false and (hit.Transparency ~= 0) then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "Cold water."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+
+	if (hit.Name == "DontDrink") and debounce == false and (hit.Transparency ~= 0) then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "I'm not gonna drink that..."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+
+	if (hit.Name == "Reflect") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "oo I'm looking good ;D"
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+
+	if (hit.Name == "BoyT") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "Boy's Bathroom."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+
+	if (hit.Name == "GirlT") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "Girl's Bathroom."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+
+	if (hit.Parent.Name == "Skeleton") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "O_o` a Skeleton"
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+
+	if (hit.Parent.Name == "Funituresthatway") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "Funitures that way..."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+
+	if (hit.Name == "screen") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "A screen..."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Parent.Name == "lavageyser") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "That geyser could explode at any second."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Parent.Name == "Drakobloxxers") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "A Drakebloxxer! I better run."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Name == "lava") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "I better be careful around that lava..."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Name == "boardeddoor") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "I'll need to find another way around."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Name == "portrait2painting") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "It's a portrait of someone draped in extravagent clothes holding a scepter."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Name == "portrait1painting") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "It's a portrait of someone in a lavish uniform."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Name == "landscapepainting") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "It's a beautiful landscape painting."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Name == "battlepainting") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "It appears to be a painting of a knight in the middle of a battlefield."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Name == "castlegatepainting") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "It's a painting of castle gates opening."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Name == "castellockeddoor") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "It's locked. I need a key."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Name == "castleblockeddoor") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "It seems to be blocked from the other side. I'll have to find another way around."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Name == "CastleKey") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "A key. I could use this."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Name == "console") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "I better not touch that."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+	
+	if (hit.Parent.Name == "microscope") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "Ooh, a microscope!"
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+
+	if (hit.Name == "Hot") and (hit.Transparency ~= 1) and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "Ow! It's HOT!"
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+
+	if (hit.Name == "locked") and (hit.Transparency ~= 1) and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "It`s locked..."
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+
+	if (hit.Name == "Soda") and (hit.Transparency < 1) and fooddebounce == false then
+		fooddebounce = true
+		playergui.Enabled = true
+		textlabel.Text = "Mmm, soda..."
+		char.Humanoid.Health = char.Humanoid.Health + 1
+		wait()
+		hit:remove()
+		task.wait(0.1)
+		fooddebounce = false
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end 
+	if hit.Name == nil then
+		return
+	end
+	
+	if (hit.Parent.Name == "chefbuttons") or (hit.Parent.Name == "chefbodykit") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		if player.Misc.Job.Value == 3 then
+			textlabel.Text = "I can make cakes for money here."
+		else
+			textlabel.Text = "I need to be a chef to use this station."
+		end
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+
+	if (hit.Name == "AdminDoor") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "Admin door, Buy StudioARE admin shirt to open"
+		task.wait(3)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+
+	if (hit.Name == "Camera") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "Camera"
+		wait(3)
+		game.Lighting.Camera:clone().Parent = pack
+		textlabel.Text = "Click one time to remove your mouse icon"
+		wait(4)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+
+	if (hit.Name == "Megaphone") and debounce == false then
+		debounce = true
+		playergui.Enabled = true
+		textlabel.Text = "Megaphone"
+		wait(3)
+		game.Lighting.Megaphone:clone().Parent = pack
+		textlabel.Text = "Click one time to remove your mouse icon"
+		wait(4)
+		textlabel.Text = ""
+		playergui.Enabled = false
+		debounce = false
+	end
+
+	if (hit.Name == "RemoveTool") and debounce == false then
+		debounce = true
+		print("remove tool")
+		c = player.Backpack:GetChildren()
+		for i = 1, #c do
+			if (c[i].Name ~= "Action") and (c[i].Name ~= "Reset") then
+				c[i]:remove()
+			else end
+		end
+		debounce = false
+	end
+
+	if (hit.Name == "RemoveCam") then
+		c = player.Backpack:GetChildren()
+		for i = 1, #c do
+			if (c[i].Name == "Camera") then
+				c[i]:remove()
+			else end
+		end
+	end
+
+	if (hit.Name == "RemovePhone") then
+		c = player.Backpack:GetChildren()
+		for i = 1, #c do
+			if (c[i].Name == "Megaphone") then
+				c[i]:remove()
+			else end
+		end
+	end
+
+	if (hit.Name == "RemoveTrowle") then
+		c = player.Backpack:GetChildren()
+		for i = 1, #c do
+			if (c[i].Name == "Trowel") then
+				c[i]:remove()
+			else end
+		end
+	end
+
+	if (hit.Name == "AddPlane") then
+		game.Lighting.Plane:clone().Parent = pack
+	end
+
+	--MORE
+
+	--mouse.Icon = "rbxasset://textures\\GunCursor.png"
+end
+
+
+
+function onSelected(mouse)
+	player = game.Players.LocalPlayer
+	mouse = player:GetMouse()
+	--mouse.Icon = "rbxasset://textures\\GunCursor.png"
+	mousecon = mouse.Button1Down:connect(function() onButton1Down(mouse) end)
+end
+
+local function onDeselected()
+	mousecon:Disconnect()
+	mousecon = nil
+end
+
+bin.Activated:connect(onSelected)
+bin.Deactivated:Connect(onDeselected)

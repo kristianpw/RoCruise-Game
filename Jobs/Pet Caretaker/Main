@@ -1,0 +1,297 @@
+local model = script.Parent
+local start = model.start
+local button = model.button
+local spout = model.spout
+local rep = game:GetService("ReplicatedStorage")
+local owner = model:FindFirstChild("Owner")
+local petevent = game.Workspace.petevent:FindFirstChild("event")
+local debounce = false
+local active = model.Active
+local spongedebounce = false
+local blowdrydebounce = false
+local playerhit = false
+local clean = 0
+local dry = 0
+local petTouchedConnection
+local showerbutton
+local blowdrytouch
+local pet
+local petmesh
+local player
+local playerjob
+local click1
+local click2
+local click3
+local clickdetect
+local clickdetect2
+local clickdetect3
+
+local spawn1 = model.spawn1
+local spawn2 = model.spawn2
+local spawn3 = model.spawn3
+local spawn4 = model.spawn4
+
+local check1 = model.check1
+local check2 = model.check2
+local check3 = model.check3
+
+local pets = {
+	rep.PetModels.Pet1,
+	rep.PetModels.Pet2,
+	rep.PetModels.Pet3,
+	rep.PetModels.Pet4,
+	rep.PetModels.Pet5,
+	rep.PetModels.Pet6,
+	rep.PetModels.Pet7,
+	rep.PetModels.Pet8,
+}
+
+local soapbottles = {
+	{name = "red", bottle = model.red, color = Color3.fromRGB(196, 40, 28)},
+	{name = "black", bottle = model.black, color = Color3.fromRGB(27, 42, 53)},
+	{name = "white", bottle = model.white, color = Color3.fromRGB(237, 234, 234)},
+	{name = "blue", bottle = model.blue, color = Color3.fromRGB(33, 84, 185)},
+	{name = "yellow", bottle = model.yellow, color = Color3.fromRGB(245, 205, 48)},
+	{name = "green", bottle = model.green, color = Color3.fromRGB(75, 151, 75)}
+}
+
+local displaybuttons = {
+	model.one,
+	model.two,
+	model.three
+}
+
+local currentorder = {}
+
+local function shufflecolor()
+	currentorder = {}
+	local temporder = {unpack(soapbottles)}
+	for i = 1, #soapbottles do
+		local randomindex = math.random(#temporder)
+		table.insert(currentorder, temporder[randomindex])
+		table.remove(temporder, randomindex)
+	end
+	return currentorder
+end
+
+local function startjob(touchpart)
+	if touchpart.Parent.Name == "petevent" then
+		return
+	end
+	if touchpart.Parent and touchpart.Parent ~= game.Workspace then
+		local human = touchpart.Parent:FindFirstChild("Humanoid")
+		if human then
+			player = game.Players:GetPlayerFromCharacter(touchpart.Parent)
+			if player then
+				playerjob = game.Players:FindFirstChild(player.Name).Misc.Job
+				playerhit = true
+			end
+		end
+	end
+	if playerjob then
+		if active.Value == 0 and playerjob.Value == 1 and playerhit == true then
+			playerhit = false
+			active.Value = 1
+			clean = 0
+			dry = 0
+			click1 = nil
+			click2 = nil
+			click3 = nil
+			local spongedebounce = false
+			local blowdrydebounce = false
+			local debounce = false
+			check1.Value = 0
+			check2.Value = 0 
+			check3.Value = 0
+			start.Color = Color3.fromRGB(27, 42, 53)
+			local newowner = player
+			owner.Value = newowner.Name
+			local rng = math.random(1,8)
+			pet = pets[rng]:Clone()
+			pet.Parent = model.Parent
+			pet.Position = spawn1.Position
+			petmesh = pet:FindFirstChild("Mesh")
+			if pet.Name == "Pet5" then 									--companion cube
+				for i, v in pairs(pet:GetChildren()) do
+					if v:IsA('Decal') then
+						v.Color3 = Color3.fromRGB(135, 135, 135)
+					end
+				end
+			elseif petmesh then 										--pet with mesh
+				pet.Mesh.VertexColor = Vector3.new(0.4,0.4,0.4)
+			else 														-- pet without mesh
+				pet.Reflectance = pet.Reflectance + 0.6
+			end
+			shufflecolor()
+			task.wait()
+			click1 = currentorder[1].bottle:FindFirstChild("ClickDetector")
+			click2 = currentorder[2].bottle:FindFirstChild("ClickDetector")
+			click3 = currentorder[3].bottle:FindFirstChild("ClickDetector")
+			for i, buttons in ipairs(displaybuttons)do
+				buttons.Color = currentorder[i].color
+			end
+
+			clickdetect = click1.MouseClick:Connect(function()
+				if debounce == false then
+					debounce = true
+					check1.Value = 1
+					task.wait(0.1)
+					clickdetect:Disconnect()
+					debounce = false
+				end
+			end)
+			clickdetect2 = click2.MouseClick:Connect(function()
+				if debounce == false then
+					debounce = true
+					check2.Value = 1
+					task.wait(0.1)
+					clickdetect2:Disconnect()
+					debounce = false
+				end
+			end)
+			clickdetect3 = click3.MouseClick:Connect(function()
+				if debounce == false then
+					debounce = true
+					check3.Value = 1
+					task.wait(0.1)
+					clickdetect3:Disconnect()
+					debounce = false
+				end
+			end)
+
+		end
+	end
+	
+	local function blowdry()
+		blowdrytouch = pet.Touched:Connect(function(hit)
+			if hit.Name == "blowdry" and blowdrydebounce == false and dry < 3 then
+				blowdrydebounce = true
+				dry = dry + 1
+				local dropsscript = pet:FindFirstChild("drops"..dry)
+				dropsscript:Destroy()
+				task.wait(1)
+				blowdrydebounce = false
+			elseif hit.Name == "blowdry" and blowdrydebounce == false and dry == 3 then
+				dry = 0
+				local currentowner = owner.Value
+				local playercash = game.Players:FindFirstChild(currentowner).leaderstats:FindFirstChild("Cash")
+				local jobstat = game.Players:FindFirstChild(currentowner).PlayerStats.PetJob
+				playercash.Value += 10
+				jobstat.Value += 1
+				local moneystat = game.Players:FindFirstChild(currentowner).PlayerStats.MoneyEarned
+				moneystat.Value += 10
+				pet:Destroy()
+				start.Color = Color3.fromRGB(75, 151, 75)
+				click1 = nil
+				click2 = nil
+				click3 = nil
+				spongedebounce = false
+				local rng = math.random(1,20) 					--Pets escape event
+				if rng == 20 then
+					petevent.Value = 1
+				end
+				active.Value = 0
+				blowdrytouch:Disconnect()
+			end
+			if hit == nil or hit.Name == "drops" then
+				task.wait(0.1)
+			end
+		end)
+	end
+	
+	local function shower()
+		if petTouchedConnection then
+			petTouchedConnection:Disconnect()
+		end
+		pet.Position = spawn3.Position
+		button.Color = Color3.fromRGB(75, 151, 75)
+		showerbutton = button.Touched:Connect(function()
+			showerbutton:Disconnect()
+			button.Color = Color3.fromRGB(27, 42, 53)
+			local waterscript = rep.watersprayscript1:Clone()
+			waterscript.Parent = spout
+			task.wait(1.5)
+			local drops1 = rep.waterdrops:Clone()
+			drops1.Name = "drops1"
+			drops1.Parent = pet
+			local script1 = pet:FindFirstChild("script0")
+			script1:Destroy()
+			task.wait(1.5)
+			button.Color = Color3.fromRGB(99, 95, 98)
+			local drops2 = rep.waterdrops:Clone()
+			drops2.Name = "drops2"
+			drops2.Parent = pet
+			local script2 = pet:FindFirstChild("script1")
+			script2:Destroy()
+			task.wait(1.5)
+			local drops3 = rep.waterdrops:Clone()
+			drops3.Name = "drops3"
+			drops3.Parent = pet
+			local script3 = pet:FindFirstChild("script2")
+			script3:Destroy()
+			waterscript:Destroy()
+			pet.Position = spawn4.Position
+			blowdry()
+		end)
+	end
+	
+	local function spongebath()
+		if check1.Value == 1 and check2.Value == 1 and check3.Value == 1 then
+			check1.Value = 0
+			check2.Value = 0
+			check3.Value = 0
+			pet.Position = spawn2.Position
+			
+			petTouchedConnection = pet.Touched:Connect(function(hit)
+				if hit ~= nil or hit.Name == "water" or hit.Name == "bubble" then
+					task.wait(0.1)
+				end
+				if hit.Parent.Name == "Sponge" and spongedebounce == false and clean < 3 then
+					spongedebounce = true
+					local bubblescript = rep.bubblescript1:Clone()
+					bubblescript.Name = "script"..clean
+					bubblescript.Parent = pet
+					if pet.Name == "Pet5" then
+						for i, v in pairs(pet:GetChildren()) do
+							if v:IsA('Decal') then
+								local r = v.Color3.R * 255
+								local g = v.Color3.G * 255
+								local b = v.Color3.B * 255
+
+								r = math.min(r + 40, 255)
+								g = math.min(g + 40, 255)
+								b = math.min(b + 40, 255)
+
+								v.Color3 = Color3.fromRGB(r, g, b)
+							end
+						end
+					elseif petmesh then
+						pet.Mesh.VertexColor = pet.Mesh.VertexColor + Vector3.new(0.2,0.2,0.2)
+					else
+						pet.Reflectance = pet.Reflectance - 0.2
+					end
+					clean = clean + 1
+					task.wait(0.5)
+					spongedebounce = false
+				elseif hit.Parent.Name == "Sponge" and spongedebounce == false and clean == 3 then
+					spongedebounce = true
+					shower()
+				end
+			end)
+		end
+	end
+	
+	check1.Changed:Connect(function()
+		spongebath()
+	end)
+	check2.Changed:Connect(function()
+		spongebath()
+	end)
+	check3.Changed:Connect(function()
+		spongebath()
+	end)
+	
+	
+end
+
+start.Touched:Connect(startjob)

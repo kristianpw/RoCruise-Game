@@ -1,0 +1,80 @@
+--Serverside script to prevent cheating
+
+local buyhatremote = game.ReplicatedStorage:FindFirstChild("buyhat")
+local equipremote = game.ReplicatedStorage:FindFirstChild("equiphat")
+local hatprice
+
+local hatprices = {
+	{Name = "ArrowHat", price = "300"},
+	{Name = "FirefighterHelm", price = "300"},
+	{Name = "BlueBaseballCap", price = "600"},
+	{Name = "StageProp", price = "600"},
+	{Name = "QuestionMark", price = "800"},
+	{Name = "Cloud", price = "800"},
+	{Name = "GotMilkVisor", price = "800"},
+	{Name = "Bucket", price = "800"},
+	{Name = "BlackNinjaMask", price = "1000"},
+	{Name = "PaperBag", price = "1000"},
+	{Name = "NethackBook", price = "1337"},
+	{Name = "FruitHat", price = "2000"},
+	{Name = "CrownofWarlords", price = "5000"},
+	{Name = "SparkleTimeFedora"},
+	{Name = "HalloweenLampshade", price = "500"},
+}
+
+local function buyhatfunc(player, hat)
+	print(hat)
+	local hatprice = nil
+	for i, hats in ipairs(hatprices) do
+		if hats.Name == hat then
+			hatprice = tonumber(hatprices[i].price)
+		end
+	end
+	local char = game.Workspace:FindFirstChild(player.Name)
+	local playerstats = game.Players:FindFirstChild(player.Name)
+	local playercash = playerstats.leaderstats.Cash
+	local hatcheck = playerstats.Hats:FindFirstChild(hat)
+	local hatequipped = playerstats.Hats:FindFirstChild("HatEquipped")
+	if playercash then
+		if playercash.Value >= hatprice and hatcheck.Value == 0 then
+			playercash.Value = playercash.Value - hatprice
+			local hatstat = playerstats.PlayerStats.HatsOwned
+			hatstat.Value += 1
+			local spentstat = playerstats.PlayerStats.MoneySpent
+			spentstat.Value += hatprice
+			hatcheck.Value = 1
+			if hatequipped.Value ~= hat then
+				local currenthat = char:FindFirstChild(hatequipped.Value)
+				if currenthat then
+					currenthat:Destroy()
+				end
+			end
+			local hatclone = game.ReplicatedStorage.Hats:FindFirstChild(hat):Clone()
+			hatclone.Parent = char
+			--hat.Handle.CFrame = char.Head.CFrame * CFrame.new(0, 0.5, 0) * hat.Attachment:inverse()
+			-- 
+			--Make equip current hat code here
+			--
+			hatequipped.Value = hat
+		end
+	end
+end
+
+local function equiphatfunc(player, hat)
+	local char = game.Workspace:FindFirstChild(player.Name)
+	local playerstats = game.Players:FindFirstChild(player.Name)
+	local hatcheck = playerstats.Hats:FindFirstChild(hat)
+	local hatequipped = playerstats.Hats:FindFirstChild("HatEquipped")
+	if hatcheck.Value == 1 and hatequipped.Value ~= hat then
+		local currenthat = char:FindFirstChild(hatequipped.Value)
+		if currenthat then
+			currenthat:Destroy()
+		end
+		local hatclone = game.ReplicatedStorage.Hats:FindFirstChild(hat):Clone()
+		hatclone.Parent = char
+		hatequipped.Value = hat
+	end
+end
+
+buyhatremote.OnServerEvent:Connect(buyhatfunc)
+equipremote.OnServerEvent:Connect(equiphatfunc)

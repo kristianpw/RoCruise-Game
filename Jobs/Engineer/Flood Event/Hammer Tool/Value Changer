@@ -1,0 +1,72 @@
+local tool = script.Parent
+local hitpart = tool:FindFirstChild("hitpart")
+local activated = tool:FindFirstChild("event")
+local event = game.Workspace.engineerevent
+
+activated.Changed:Connect(function()
+	print("hit part changed func")
+	if activated == 1 then
+		activated = 0
+		if hitpart.Value == "hole1hitbox" then
+			local hole = event.hole1.fixed
+			if hole.Value > 0 then
+				hole.Value = hole.Value - 1
+			end
+		elseif hitpart.Value == "hole2hitbox" then
+			local hole = event.hole2.fixed
+			if hole.Value > 0 then
+				hole.Value = hole.Value - 1
+			end
+		elseif hitpart.Value == "hole3hitbox" then
+			local hole = event.hole3.fixed
+			if hole.Value > 0 then
+				hole.Value = hole.Value - 1
+			end
+		elseif hitpart.Value == "hole4hitbox" then
+			local hole = event.hole4.fixed
+			if hole.Value > 0 then
+				hole.Value = hole.Value - 1
+			end
+		elseif hitpart.Value == "hole5hitbox" then
+			local hole = event.hole5.fixed
+			if hole.Value > 0 then
+				hole.Value = hole.Value - 1
+			end
+		elseif hitpart.Value == "hole6hitbox" then
+			local hole = event.hole6.fixed
+			if hole.Value > 0 then
+				hole.Value = hole.Value - 1
+			end
+		elseif hitpart.Value == "hole7hitbox" then
+			local hole = event.hole7.fixed
+			if hole.Value > 0 then
+				hole.Value = hole.Value - 1
+			end
+		elseif hitpart.Value == "hole8hitbox" then
+			local hole = event.hole8.fixed
+			if hole.Value > 0 then
+				hole.Value = hole.Value - 1
+			end
+		elseif hitpart.Value == "hole9hitbox" then
+			local hole = event.hole9.fixed
+			if hole.Value > 0 then
+				hole.Value = hole.Value - 1
+			end
+		elseif hitpart.Value == "hole10hitbox" then
+			local hole = event.hole10.fixed
+			if hole.Value > 0 then
+				hole.Value = hole.Value - 1
+			end
+		elseif hitpart.Value == "hole11hitbox" then
+			local hole = event.hole11.fixed
+			if hole.Value > 0 then
+				hole.Value = hole.Value - 1
+			end
+		elseif hitpart.Value == "hole12hitbox" then
+			local hole = event.hole12.fixed
+			if hole.Value > 0 then
+				hole.Value = hole.Value - 1
+			end
+		end
+	end
+end)

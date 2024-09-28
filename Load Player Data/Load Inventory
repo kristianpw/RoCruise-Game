@@ -1,0 +1,432 @@
+--Loads/generates players inventory (furniture, hats pets, stats, etc) based on their saved data.
+
+local marketplace = game:GetService("MarketplaceService")
+
+function onPlayerRespawned(newPlayer)
+	print("Respawned; Moving player to base...")
+
+	while true do
+		wait()
+		if newPlayer.Character ~= nil then
+			print("no char on player respawned")
+			break --No broken scripts plz.
+		end
+	end
+	
+	local respawned = newPlayer:FindFirstChild("respawned")
+	respawned.Value = 1
+
+	if newPlayer.Misc.Tutorial.Value == 0 then
+		local tutorial = game.Workspace:FindFirstChild("Tutorial")
+		newPlayer.Character:moveTo(game.Workspace.Tutorial:findFirstChild("tutorialspawn").Position + Vector3.new(0,7,0))
+		return
+	end
+	if (newPlayer.Misc.Job.Value ~= 0) then
+		newPlayer.Character:moveTo(game.Workspace:findFirstChild("Room"..newPlayer.Number.Value).Base.Position + Vector3.new(0,5,0))
+		if newPlayer.Misc.Job.Value == 2 then
+			local watercancheck = newPlayer.Backpack:FindFirstChild("WaterCan")
+			if watercancheck == nil then
+				local watercanclone = game.ReplicatedStorage.Tools.WaterCan:Clone()
+				watercanclone.Parent = newPlayer.Backpack
+			end
+		end
+		if newPlayer.Misc.Job.Value == 5 then
+			local hammercheck = newPlayer.Backpack:FindFirstChild("Hammer")
+			if hammercheck == nil then
+				local clone = game.ReplicatedStorage.Tools.Hammer:Clone()
+				clone.Parent = newPlayer.Backpack
+			end
+		end
+		if newPlayer.Misc.Job.Value == 1 then
+			local spongecheck = newPlayer.Backpack:FindFirstChild("Sponge")
+			if spongecheck == nil then
+				local clone = game.ReplicatedStorage.Tools.Sponge:Clone()
+				clone.Parent = newPlayer.Backpack
+				local clone2 = game.ReplicatedStorage.Tools["Blow Dryer"]:Clone()
+				clone2.Parent = newPlayer.Backpack
+			end
+		end
+	end
+	
+	--Remove player's website accessories and equip ingame hat
+	
+	local char = game.Workspace:FindFirstChild(newPlayer.Name)
+	task.wait(0.5)
+
+	for i, hat in pairs(char:GetChildren()) do
+		if hat:IsA('Accessory') then
+			hat:Destroy()
+		end
+	end
+
+	local hatequipped = newPlayer.Hats:FindFirstChild("HatEquipped")
+	if hatequipped.Value ~= nil then
+		local hatclone = game.ReplicatedStorage.Hats:FindFirstChild(hatequipped.Value):Clone()
+		hatclone.Parent = char
+	end
+	
+end
+
+function onPlayerByeBye(player) -- ByeBye player, byebye base.
+	local intv = player:findFirstChild("Number")
+	local place = game.Workspace:findFirstChild("Room"..intv.Value)
+	local owner = place:findFirstChild("Owner")
+	if intv ~= nil and place ~= nil then 
+		if owner.Value == player.Name then --Check who owns the base so we can delete it! >:)
+		place:remove()
+		end
+	end
+end
+
+function onPlayerEntered(newPlayer)
+	print("Entered; Finding Base...")
+	num = math.random(1,20) -- The bases are chosen by random :O
+	while true do
+		print(num)
+		local roomcheck = game.Workspace:FindFirstChild("Room"..num)
+			if roomcheck ~= nil then --If base already out there then...
+				local ownercheck = roomcheck:FindFirstChild("Owner")
+				if ownercheck ~= nil then
+					print("Base already in play.")
+					--num = math.random(1,20) --...Base is chosen again :)
+					onPlayerEntered(newPlayer)
+				else
+					break
+				end
+			else
+				break 
+		end
+		task.wait()
+	end
+
+	local int = Instance.new("IntValue")
+	int.Parent = newPlayer
+	int.Name = "Number"
+	int.Value = num -- Keep the number of the base in the character for future use...
+
+	local hut = game.ReplicatedStorage.Bases:findFirstChild("Room"..num):clone() -- Use the chosen number to find the base :)
+	hut.Parent = game.Workspace
+	hut:MakeJoints()
+	hut.Owner.Value = newPlayer.Name
+	
+	local job = Instance.new("IntValue")
+	job.Name = "classval"
+	job.Parent = newPlayer
+
+	local gambling = Instance.new("IntValue")
+	gambling.Name = "gamblingval"
+	gambling.Parent = newPlayer
+	gambling.Value = 0
+	
+	local respawned = Instance.new("IntValue")
+	respawned.Name = "respawned"
+	respawned.Parent = newPlayer
+	respawned.Value = 0
+	
+	local VIPint = Instance.new("IntValue")
+	VIPint.Name = "VIPval"
+	VIPint.Parent = newPlayer
+	VIPint.Value = 0
+	
+	--VIP Check
+
+	local VIP = marketplace:UserOwnsGamePassAsync(newPlayer.UserId, 6469732045)
+	if VIP then
+		print("player has VIP")
+		local teapotpet = newPlayer.Pets:FindFirstChild("Pet14")
+		if teapotpet.Value ~= 1 then
+			teapotpet.Value = 1
+		end
+
+		local STF = newPlayer.Hats:FindFirstChild("SparkleTimeFedora")
+		if STF.Value ~= 1 then
+			STF.Value = 1
+		end
+
+		VIPint.Value = 1
+	end
+
+	newPlayer.Changed:connect(function (property)
+		if (property == "Character") then
+			onPlayerRespawned(newPlayer)
+		end
+	end)
+
+	while true do
+		task.wait()
+		if newPlayer.Character ~= nil then
+			--print("newplayer char is nil, break")
+			break
+		end
+	end
+
+	local touch = script.MoveScriptToPlayer:clone()
+	touch.Disabled = false --New script in play.
+	touch.Parent = hut
+
+	local m = Instance.new("Model")
+	m.Name = newPlayer.Name .. "'s Room"
+	m.Parent = hut
+
+	local h = Instance.new("Humanoid")
+	h.Parent = m
+	h.MaxHealth = 0
+	h.Health = 0
+
+	local head = hut.FlagPillar
+	head.Parent = m
+	head.Name = "Head"
+	
+	
+	--Main furniture loading loop
+	
+	if newPlayer.CharacterAdded then
+		newPlayer:WaitForChild("FurnitureStorage")
+		local base = game.Workspace:FindFirstChild("Room"..newPlayer.Number.Value)
+		for i, furniture in newPlayer.FurnitureStorage:GetChildren() do
+			if furniture.Value == 1 then
+				local furniturepiece = base:FindFirstChild(furniture.Name)
+				while true do
+					if furniturepiece == nil then
+						print("furniturepeice is nil")
+						task.wait(1)
+						local base = game.Workspace:FindFirstChild("Room"..newPlayer.Number.Value)
+						print(base)
+						local furniturepiece = base:FindFirstChild(furniture.Name)
+						print(furniturepiece)
+						print(furniture)
+					else
+						break
+					end
+				end
+				for i, v in furniturepiece:GetChildren() do
+					if v:IsA('BasePart') then
+						v.Transparency = 0
+						v.CanCollide = true
+					end
+				end
+			end
+		end
+		
+		--Played during Alpha
+		
+		if newPlayer.Misc.Alpha.Value == 0 then
+			newPlayer.Misc.Alpha.Value = 1
+		end
+		
+		
+		--Alternative furnitures
+		
+		if newPlayer.FurnitureStorage.Currenttable.Value == "table" then
+			for i, v in base:FindFirstChild("Table3"):GetChildren() do
+				if v:IsA('BasePart') then
+					v.Transparency = 1
+					v.CanCollide = false
+				end
+			end
+		end
+		if newPlayer.FurnitureStorage.Currenttable.Value == "table3" then
+			base.Table3.Part15.Transparency = 0.3
+			for i, v in base:FindFirstChild("Table"):GetChildren() do
+				if v:IsA('BasePart') then
+					v.Transparency = 1
+					v.CanCollide = false
+				end
+			end
+		end
+		if newPlayer.FurnitureStorage.Currentbed.Value == "Bed" then
+			for i, v in base:FindFirstChild("Bed2"):GetChildren() do
+				if v:IsA('BasePart') then
+					v.Transparency = 1
+					v.CanCollide = false
+				end
+			end
+		end
+		if newPlayer.FurnitureStorage.Currentbed.Value == "Bed2" then
+			base.Bed2.PartA.Transparency = 0.3
+			base.Bed2.PartB.Transparency = 0.3
+			base.Bed2.PartC.Transparency = 0.3
+			base.Bed2.PartD.Transparency = 0.3
+			for i, v in base:FindFirstChild("Bed"):GetChildren() do
+				if v:IsA('BasePart') then
+					v.Transparency = 1
+					v.CanCollide = false
+				end
+			end
+		end
+		if newPlayer.FurnitureStorage.Currentsofa.Value == "Sofa" then
+			for i, v in base:FindFirstChild("Sofa2"):GetChildren() do
+				if v:IsA('BasePart') then
+					v.Transparency = 1
+					v.CanCollide = false
+				end
+			end
+		end
+		if newPlayer.FurnitureStorage.Currentsofa.Value == "Sofa2" then
+			for i, v in base:FindFirstChild("Sofa"):GetChildren() do
+				if v:IsA('BasePart') then
+					v.Transparency = 1
+					v.CanCollide = false
+				end
+			end
+		end
+		if newPlayer.FurnitureStorage.Currentlamp.Value == "Lamp2" then
+			base.Lamp2.Lightlamp.Transparency = .3
+			for i, v in base:FindFirstChild("Lamp1"):GetChildren() do
+				if v:IsA('BasePart') then
+					v.Transparency = 1
+					v.CanCollide = false
+				end
+			end
+		end
+		if newPlayer.FurnitureStorage.Currentlamp.Value == "Lamp1" then
+			base.Lamp1.Lightlamp.Transparency = .3
+			for i, v in base:FindFirstChild("Lamp2"):GetChildren() do
+				if v:IsA('BasePart') then
+					v.Transparency = 1
+					v.CanCollide = false
+				end
+			end
+		end
+		
+		
+		--Fixing partial transparency parts
+		
+		if newPlayer.FurnitureStorage.Oven.Value == 1 then
+			base.Oven.loced.Transparency = 0.3
+		end
+		if newPlayer.FurnitureStorage.Toilet.Value == 1 then
+			base.Toilet.DontDrink.Transparency = 0.2
+		end
+		if newPlayer.FurnitureStorage.Bathtub.Value == 1 then
+			base.Bathtub.Water.Transparency = 0.2
+		end
+		
+		
+		--Food
+		
+		if newPlayer.FurnitureStorage.Cheese.Value == 1 then
+			base.Cheese.Cheese.Value = 8
+			local Cheese = base.Cheese
+			for i, v in Cheese:GetChildren() do
+				if v:IsA('BasePart') then
+					local detector = v:FindFirstChild("ClickDetector")
+					detector.MaxActivationDistance = 32
+				end
+			end
+		end
+		if newPlayer.FurnitureStorage.Cake.Value == 1 then
+			base.Cake.CakeGiver1.ClickDetector.MaxActivationDistance = 32
+		end
+		if newPlayer.FurnitureStorage.Teakettle.Value == 1 then
+			base.Teakettle.Teakettle2.ClickDetector.MaxActivationDistance = 32
+		end
+		if newPlayer.FurnitureStorage.Teapots.Value == 1 then
+			base.Teapots.Teapot1.ClickDetector.MaxActivationDistance = 32
+		end
+		
+		
+		--Player's room walls
+		
+		if newPlayer.Room.Color ~= nil then
+			local brickcolor = BrickColor.new(newPlayer.Room.Color.Value)
+			for i, v in base.Room:GetChildren() do
+				if v:IsA('BasePart') then
+					v.BrickColor = brickcolor
+				end
+			end
+		end
+		if newPlayer.Room.Reflectancy.Value ~= nil then
+			local reflectancy = newPlayer.Room.Reflectancy.Value
+			for i, v in base.Room:GetChildren() do
+				if v:IsA('BasePart') then
+					v.Reflectance = reflectancy
+				end
+			end
+		end
+		if newPlayer.Room.Transparency.Value ~= nil then
+			local transparency = newPlayer.Room.Transparency.Value
+			for i, v in base.Room:GetChildren() do
+				if v:IsA('BasePart') then
+					v.Transparency = transparency
+				end
+			end
+		end
+		if newPlayer.Room.Surface.Value ~= "" then
+			local surface
+			local surfaceval = newPlayer.Room.Surface.Value
+			if surfaceval == "Enum.SurfaceType.Inlet" then
+				surface = Enum.SurfaceType.Inlet
+			elseif surfaceval == "Enum.SurfaceType.Weld" then
+				surface = Enum.SurfaceType.Weld
+			elseif surfaceval == "Enum.SurfaceType.Universal" then
+				surface = Enum.SurfaceType.Universal
+			elseif surfaceval == "Enum.SurfaceType.Studs" then
+				surface = Enum.SurfaceType.Studs
+			elseif surfaceval == "" then
+				surface = Enum.SurfaceType.Smooth
+			else return
+			end
+			for i, v in base.Room:GetChildren() do
+				if v:IsA('BasePart') then
+					v.TopSurface = surface
+					v.BackSurface = surface
+					v.BottomSurface = surface
+					v.FrontSurface = surface
+					v.LeftSurface = surface
+					v.RightSurface = surface
+				end
+			end
+		end
+		
+		
+		--Misc
+		
+		if newPlayer.FurnitureStorage.TV.Value == 1 then
+			base.TV.Screen2.ClickDetector.MaxActivationDistance = 32
+		end
+		
+		if newPlayer.ShipUpgrades.Roomship.Value == 1 then
+			local shipbuybutton = base:FindFirstChild("SpaceShip (60 Cash)")
+			shipbuybutton:Destroy()
+			base.HangarSystem.Regen.Value = 1
+			task.wait(0.1)
+			base.HangarSystem.Regen.Value = 0
+		end
+		
+		if newPlayer.Pets:FindFirstChild("CurrentPet").Value ~= nil then
+			print("pet spawning")
+			local currentpet = newPlayer.Pets:FindFirstChild("CurrentPet").Value
+			local petspawn = base:FindFirstChild("PetSpawn")
+			local petclone = game.ReplicatedStorage.PlayerPets:FindFirstChild(currentpet):Clone()
+			petclone.Name = "PlayerPet"
+			petclone.Position = petspawn.Position + Vector3.new(0,1,0)
+			petclone.Parent = base:FindFirstChild("PetHouse")
+		end
+		
+	else 
+		task.wait()
+	end
+	
+	
+	--onPlayerRespawned(newPlayer)
+	
+	--newPlayer.CharacterAdded:Connect(function()
+	--	onPlayerRespawned(newPlayer)
+	--end)
+end
+
+game.Players.PlayerRemoving:connect(onPlayerByeBye)
+
+game.ReplicatedStorage:FindFirstChild("PlayerJoined").Event:Connect(function(player)
+	onPlayerEntered(player)
+	while true do
+		task.wait(1)
+		local respawned = player:FindFirstChild("respawned")
+		if respawned.Value == 0 then
+			onPlayerRespawned(player)
+		else
+			break
+		end
+	end
+end)

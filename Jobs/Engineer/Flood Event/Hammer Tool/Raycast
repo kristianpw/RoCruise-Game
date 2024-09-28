@@ -1,0 +1,47 @@
+ocal tool = script.Parent
+local pipefixed = game.ReplicatedStorage.pipefixed --ServerScriptService > Pipe
+local debounce = false
+
+local function mouseclick(mouse)
+	local player = game.Players.LocalPlayer
+	local filter = {game.Workspace.water, game.Workspace.watertween}
+	
+	local params = RaycastParams.new()
+	params.FilterDescendantsInstances = filter
+	params.FilterType = Enum.RaycastFilterType.Blacklist
+	
+	
+	if debounce == false then
+		debounce = true
+		local hit = mouse.Target
+		
+		local raycastResult = workspace:Raycast(mouse.UnitRay.Origin, mouse.UnitRay.Direction * 1000, params)
+		if raycastResult then
+			hit = raycastResult.Instance
+			print(hit)
+		end
+		
+		if (hit == nil) then return end
+
+		if hit.Parent.Name == "engineerevent" then
+			pipefixed:FireServer(hit)
+		end
+		task.wait(0.5)
+		debounce = false
+	end
+end
+
+local function toolactivated(mouse)
+	local player = game.Players.LocalPlayer
+	mouse = player:GetMouse()
+	mousecon = mouse.Button1Down:Connect(function() mouseclick(mouse) end)
+end
+
+local function tooldeactivated()
+	mousecon:Disconnect()
+	mousecon = nil
+end
+
+
+tool.Deactivated:Connect(tooldeactivated)
+tool.Activated:Connect(toolactivated)

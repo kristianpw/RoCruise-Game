@@ -1,0 +1,18 @@
+local bombfired = game.ReplicatedStorage:FindFirstChild("BombFired")
+local speed = 200
+
+local lifetime = 30
+
+local function firebomb(player, bomb)
+	local player = player
+	local bomb = bomb
+	local bombclone = bomb:Clone()
+	bombclone.Name = "BombClone"
+	bombclone.LinearVelocity.MaxForce = math.huge
+	bombclone.LinearVelocity.VectorVelocity = bomb.CFrame.LookVector * 150
+	bombclone.Transparency = 0
+	bombclone.Parent = game.Workspace
+	game.Debris:AddItem(bombclone, lifetime)
+end
+
+bombfired.OnServerEvent:Connect(firebomb)

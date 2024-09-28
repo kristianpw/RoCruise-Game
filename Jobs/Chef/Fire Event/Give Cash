@@ -1,0 +1,49 @@
+amnt = 30
+
+function onTouched(part)
+	local fire = script.Parent.fire
+	if fire.Value == 1 then --Checks to see if hit detection is player since fire is now put out
+		local h = part.Parent:findFirstChild("Humanoid")
+		if (h~=nil) then
+			local thisplr = game.Players:findFirstChild(h.Parent.Name)
+			if (thisplr~=nil) then
+				local stats = thisplr:findFirstChild("leaderstats")
+				if (stats~=nil) then
+					local score = stats:findFirstChild("Cash")
+					local jobstat = thisplr:FindFirstChild("PlayerStats"):FindFirstChild("ChefJob")
+					if (score~=nil) then
+						local owner = script.Parent.Owner
+						if owner.Value == thisplr.Name then
+							score.Value = score.Value + amnt
+							jobstat.Value += 1
+							local moneystat = thisplr.PlayerStats.MoneyEarned
+							moneystat.Value += amnt
+							local burntstat = thisplr.PlayerStats.BurntCakes
+							burntstat.Value += 1
+							local jobstat = thisplr.PlayerStats.ChefJob
+							jobstat.Value += 1
+							script.Parent:remove()
+							wait()
+						else
+							task.wait(0.1)
+							return
+						end
+					end
+				end
+			end
+		end
+	elseif fire.Value == 0 then --Checks to see if hit detection is fire extinguisher
+		if part.Name == "firefoam" then
+			local firescript = script.Parent.firescript
+			firescript:Destroy()
+			local fire = script.Parent.fire
+			fire.Value = 1
+			task.wait(0.1)
+		else
+			task.wait(0.1)
+			return
+		end
+	end
+end
+
+script.Parent.Touched:connect(onTouched)

@@ -1,0 +1,19 @@
+--Put into each individual pipe part
+
+local hole = script.Parent
+local fixed = hole.fixed
+
+fixed.Changed:Connect(function()
+	if fixed.Value == 2 then
+		local script3 = hole.watersprayscript3
+		script3:Destroy()
+	elseif fixed.Value == 1 then
+		local script2 = hole.watersprayscript2
+		script2:Destroy()
+	elseif fixed.Value == 0 then
+		local script1 = hole.watersprayscript1
+		script1:Destroy()
+		fixed.Value = 0
+		hole.Transparency = 1
+	end
+end)

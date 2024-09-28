@@ -1,0 +1,25 @@
+local water = game.ReplicatedStorage.water
+local hole = script.Parent
+
+while true do
+	local rng = math.random(1,5)/10
+	local waterclone = water:Clone()
+	waterclone.CFrame = hole.CFrame
+	local angle = hole.CFrame.LookVector
+	
+	local rotatedangle = CFrame.Angles(math.rad(-90),0,0) * angle
+
+	local randomHorizontal = math.rad(math.random(-15, 15)) -- Random horizontal angle
+	local randomVertical = math.rad(math.random(-15, 15)) -- Random vertical angle
+	local spreadCFrame = CFrame.Angles(randomVertical, randomHorizontal, 0)
+	local spreadVector = (spreadCFrame * rotatedangle).Unit
+
+	local bodyVelocity = Instance.new("BodyVelocity")
+	bodyVelocity.Velocity = spreadVector * 40
+	bodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+	bodyVelocity.Parent = waterclone
+
+	waterclone.Parent = game.Workspace
+	game.Debris:AddItem(waterclone, 0.4)
+	task.wait(rng)
+end

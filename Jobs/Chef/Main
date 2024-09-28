@@ -1,0 +1,153 @@
+local progress = script.Parent.Progress.Value
+local debounce = false
+local cakeburnt = script.Parent.Cakeburnt
+local cake = script.Parent.Cake
+
+local colors = {
+	{name = "Bright blue", color = Color3.fromRGB(13, 105, 172)},
+	{name = "Bright green", color = Color3.fromRGB(75, 151, 75)},
+	{name = "Bright yellow", color = Color3.fromRGB(245, 205, 48)},
+	{name = "Bright orange", color = Color3.fromRGB(218, 133, 65)}
+}
+
+local buttons = {
+	script.Parent.digit1,
+	script.Parent.digit2,
+	script.Parent.digit3,
+	script.Parent.digit4
+}
+
+local colordisplays = {
+	script.Parent.A,
+	script.Parent.B,
+	script.Parent.C,
+	script.Parent.D
+}
+
+local currentorder = {}
+
+local function shufflecolor()
+	currentorder = {}
+	local tempcolors = {unpack(colors)}
+	for i = 1, #colors do
+		local randomindex = math.random(#tempcolors)
+		table.insert(currentorder, tempcolors[randomindex])
+		table.remove(tempcolors, randomindex)
+	end
+	return currentorder
+end
+
+local function applycolor()
+	for i = 1, #colordisplays do
+		colordisplays[i].Color = currentorder[i].color
+	end
+end
+
+local function getcolororder(colorname)
+	for i, colorinfo in ipairs(currentorder) do
+		if colorinfo.name == colorname then
+			return i
+		end
+	end
+end
+
+local function buttontouched(buttonIndex, player, button)
+	local colorNames = {"Bright green", "Bright orange", "Bright blue", "Bright yellow"}
+	local expectedColorName = colorNames[buttonIndex]
+	local expectedOrderIndex = getcolororder(expectedColorName)
+	if debounce == true then
+		return
+	elseif progress == expectedOrderIndex and debounce == false then
+		button.Reflectance = 1
+		debounce = true
+		progress = progress+1
+		if progress > #currentorder then --Job Finished
+			local rng = math.random(1,20)
+			if rng == 20 then --Random event spawn
+				local player = player.Parent
+				local cakeclone = cakeburnt:Clone()
+				task.wait(0.1)
+				local firescript = game.ReplicatedStorage.firescript:Clone()
+				firescript.Parent = cakeclone
+				local cakeowner = cakeclone.Owner
+				cakeowner.Value = player.Name
+				cakeclone.Parent = game.Workspace
+				cakeclone.Transparency = 0
+				cakeclone.Anchored = false
+				cakeclone.CanCollide = true
+				progress = 1
+			else
+				local player = player.Parent
+				local cakeclone = cake:Clone()
+				task.wait(0.1)
+				local cakeowner = cakeclone.Owner
+				cakeowner.Value = player.Name
+				cakeclone.Parent = game.Workspace
+				cakeclone.Transparency = 0
+				cakeclone.Anchored = false
+				cakeclone.CanCollide = true
+				progress = 1
+			end
+
+            --Job finished light animation
+			for i, v in pairs(colordisplays) do
+				if v:IsA('BasePart') then
+					v.Reflectance = 1
+				end
+			end
+			task.wait(0.2)
+			for i, v in pairs(colordisplays) do
+				if v:IsA('BasePart') then
+					v.Reflectance = 0
+				end
+			end
+			task.wait(0.2)
+			for i, v in pairs(colordisplays) do
+				if v:IsA('BasePart') then
+					v.Reflectance = 1
+				end
+			end
+			task.wait(0.2)
+			for i, v in pairs(colordisplays) do
+				if v:IsA('BasePart') then
+					v.Reflectance = 0
+				end
+			end
+			task.wait(0.2)
+			for i, v in pairs(colordisplays) do
+				if v:IsA('BasePart') then
+					v.Reflectance = 1
+				end
+			end
+			task.wait(0.2)
+			for i, v in pairs(colordisplays) do
+				if v:IsA('BasePart') then
+					v.Reflectance = 0
+				end
+			end
+			task.wait(0.2)
+			shufflecolor()
+			applycolor()
+		end
+		task.wait(1)
+		debounce = false
+		button.Reflectance = 0
+	else
+		local buttoncolor = button.BrickColor
+		button.BrickColor = BrickColor.new(21)
+		debounce = true
+		progress = 1
+		task.wait(1)
+		debounce = false
+		button.BrickColor = buttoncolor
+	end
+end
+
+shufflecolor()
+applycolor()
+
+for i, button in pairs(buttons) do
+	button.Touched:Connect(function(touchingpart)
+		buttontouched(i, touchingpart, buttons[i])
+	end)
+end

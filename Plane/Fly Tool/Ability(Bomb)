@@ -1,0 +1,26 @@
+local tool = script.Parent
+local UIS= game:GetService("UserInputService")
+local bombfired = game.ReplicatedStorage.BombFired
+local cooldown = false
+
+local function activate()
+	local player = script.Parent.Parent.Name
+	local human = script.Parent.Parent:FindFirstChild("Humanoid")
+	local seat = human.Plane1.Seat
+	local bomb = seat.Parent.Weapons.Bomb
+	local weapontype = game.Players:FindFirstChild(player).ShipUpgrades:FindFirstChild("ReloadA")
+	while true do
+		local userinput = UIS.InputBegan:Wait()
+		if userinput.UserInputType == Enum.UserInputType.Keyboard and userinput.KeyCode == Enum.KeyCode.B and cooldown == false and weapontype.Value == 1 then
+			cooldown = true
+			bombfired:FireServer(bomb)
+			task.wait(5)
+			cooldown = false
+		else
+			return activate()
+		end
+	end
+end
+
+
+tool.Equipped:Connect(activate)

@@ -1,0 +1,33 @@
+local tool = script.Parent
+local UIS= game:GetService("UserInputService")
+local forcefieldremoteON = game.ReplicatedStorage.ForcefieldON
+local cooldown = false
+
+local function activate()
+
+	local player = script.Parent.Parent.Name
+	local human = script.Parent.Parent:FindFirstChild("Humanoid")
+	local seat = human.Plane1.Seat
+	local forcefieldeffect = seat.ForceField
+	local forcefield = seat.Parent:FindFirstChild("Forcefield")
+	local weapontype = game.Players:FindFirstChild(player).ShipUpgrades:FindFirstChild("ReloadC")
+
+	while true do
+		local userinput = UIS.InputBegan:Wait()
+		if userinput.UserInputType == Enum.UserInputType.Keyboard and userinput.KeyCode == Enum.KeyCode.U and cooldown == false then
+			if weapontype.Value == 1 then
+				cooldown = true
+				forcefieldremoteON:FireServer(forcefieldeffect, forcefield)
+				task.wait(30)
+				cooldown = false
+			else
+				task.wait(0.1)
+			end
+		else
+			return activate()
+		end
+	end
+end
+
+
+tool.Equipped:Connect(activate)

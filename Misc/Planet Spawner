@@ -1,0 +1,58 @@
+local planetfolder = game.ServerStorage.Planets
+
+local planets = {
+	{planet = planetfolder.Skiron, message = "RoCruise is arriving at the lava planet Skiron. We will be leaving in 15 minutes."},
+	{planet = planetfolder.Cree, message = "RoCruise is arriving at the temperate planet Cree. We will be leaving in 15 minutes."},
+	{planet = planetfolder.Boreas, message = "RoCruise is arriving at the icy planet Boreas. We will be leaving in 15 minutes."}
+}
+
+local currentorder = {}
+
+local function shuffle()
+	currentorder = {}
+	local temporder = {unpack(planets)}
+	for i = 1, #planets do
+		local randomindex = math.random(#temporder)
+		table.insert(currentorder, temporder[randomindex])
+		table.remove(temporder, randomindex)
+	end
+	return currentorder
+end
+
+task.wait(300)
+--task.wait(1)
+shuffle()
+
+while true do
+	for i, planetdata in currentorder do
+		planetclone = planetdata.planet:Clone()
+		planetclone.Parent = workspace
+		
+		local arriving = Instance.new("Message")
+		arriving.Parent = game.Workspace
+		arriving.Text = planetdata.message
+		task.wait(10)
+		arriving:Destroy()
+		
+		task.wait(780)
+		
+		local warning = Instance.new("Message")
+		warning.Parent = game.Workspace
+		warning.Text = "We will be departing from "..planetdata.planet.Name.." in 2 minutes"
+		warning:Destroy()
+		
+		task.wait(120)
+		
+		local leaving = Instance.new("Message")
+		leaving.Parent = game.Workspace
+		leaving.Text = "The ship is now departing from "..planetdata.planet.Name.."."
+		task.wait(10)
+		leaving:Destroy()
+		
+		planetclone:Destroy()
+		
+		task.wait(600)
+	end
+	shuffle()
+	task.wait(1)
+end

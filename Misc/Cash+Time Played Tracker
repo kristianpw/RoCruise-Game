@@ -1,0 +1,19 @@
+function onPlayerEntered(newPlayer)
+	newPlayer.CharacterAdded:Wait()
+	local leaderboarddata = newPlayer:WaitForChild("leaderstats")
+	local cash = leaderboarddata.Cash
+	local mins = leaderboarddata.Mins
+	local VIP = newPlayer.VIPval
+
+	while true do
+		wait(60)
+		mins.Value = mins.Value + 1
+		if VIP.Value == 1 then
+			cash.Value = cash.Value + 10
+		else
+			cash.Value = cash.Value + 5
+		end
+	end
+end
+
+game.Players.ChildAdded:connect(onPlayerEntered)

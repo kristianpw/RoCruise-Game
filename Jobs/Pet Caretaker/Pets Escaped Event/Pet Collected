@@ -1,0 +1,27 @@
+local pet = script.Parent
+
+local function pettouched(part)
+	local character = part.Parent
+	if character and character:FindFirstChild("Humanoid") then
+		local player = game.Players:GetPlayerFromCharacter(character)
+		if player then
+			local playercash = player:FindFirstChild("leaderstats"):FindFirstChild("Cash")
+			if playercash then
+				playercash.Value = playercash.Value + 5
+				local petscollectestat = player.PlayerStats.PetsCollected
+				petscollectestat.Value += 1
+				local cashstat = player.PlayerStats.MoneyEarned
+				cashstat.Value += 5
+			end
+
+			local petscoll = pet.Parent:FindFirstChild("petscollected")
+			if petscoll then
+				petscoll.Value = petscoll.Value + 1
+			end
+
+			pet:Destroy()
+		end
+	end
+end
+
+pet.Touched:Connect(pettouched)

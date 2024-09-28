@@ -1,0 +1,266 @@
+local cam = game.Workspace.CurrentCamera
+local hatcam = game.Workspace.hatshopinterface.hatcam
+local hatshop = game.ReplicatedStorage.hatshop
+local hatshopinterface = game.Workspace.hatshopinterface
+local hatshopdetect = hatshopinterface.hatshopdetector.ClickDetector
+local hatshophats = game.Workspace.hatshopinterface.hats
+local buybutton = hatshopinterface.buybutton
+local equipbutton = hatshopinterface.equipbutton
+local leftbutton = hatshopinterface.left.ClickDetector
+local rightbutton = hatshopinterface.right.ClickDetector
+local xbutton = hatshopinterface.X.ClickDetector
+local rightClickConnection
+local leftClickConnection
+local xClickConnection
+local buyClickConnection
+local equipClickConnection
+local player = game.Players.LocalPlayer
+local playergui = player.PlayerGui
+local buyhatremote = game.ReplicatedStorage:FindFirstChild("buyhat")    --BuyHat in ServerScriptService
+local equipremote = game.ReplicatedStorage:FindFirstChild("equiphat") --BuyHat in ServerScriptService
+local defaultequippos = equipbutton.PrimaryPart.Position
+local defaultbuypos = equipbutton.PrimaryPart.Position
+local hatprice
+local hatmesh
+local buybackup
+local equipbackup
+local equipbuttonactive = false
+local buybuttonactive = false
+
+local nonbuyablehats = {14}
+
+local hats = {}
+
+local currentindex = 1
+
+local function showhat(index)
+	for i, hatinfo in ipairs(hats) do
+		if i == index then
+			if hatprice then
+				hatprice:Destroy()
+			end
+			hatprice = Instance.new("Hint")
+			hatprice.Text = hats[i].display
+			hatprice.Parent = playergui
+			
+			
+			local hatcheck = player.Hats:FindFirstChild(hatinfo.Name)
+			if hatcheck.Value == 1 then								--Player owns hat, turn on equip button
+				equipbutton.click.ClickDetector.MaxActivationDistance = 40
+				for i, v in pairs(equipbutton:GetChildren()) do
+					if v:IsA('BasePart') then
+						if v:FindFirstChild("Decal") then
+							v:FindFirstChild("Decal").Transparency = 0
+						end
+					end
+				end
+				
+				if equipbuttonactive == false then
+					equipbuttonactive = true
+					
+					--Move equip button in front of buy button
+					local newequippos = Vector3.new(408, 461.5, 560.45)
+					equipbutton:SetPrimaryPartCFrame(CFrame.new(newequippos) * CFrame.Angles(0, math.rad(-90), 0))
+					
+					--Move buy button to default position
+					buybutton:SetPrimaryPartCFrame(CFrame.new(defaultbuypos) * CFrame.Angles(0, math.rad(-90), 0))
+					
+					buybuttonactive = false
+				end
+				
+				buybutton.click.ClickDetector.MaxActivationDistance = 0 --Turn off buy button
+				for i, v in pairs(buybutton:GetChildren()) do
+					if v:IsA('BasePart') then
+						if v:FindFirstChild("Decal") then
+							v:FindFirstChild("Decal").Transparency = 1
+						end
+					end
+				end
+			else														--Player doesn't own hat, turn on buy button
+				if table.find(nonbuyablehats, i) then
+					buybutton.click.ClickDetector.MaxActivationDistance = 0 --Turn off buy button
+					for i, v in pairs(buybutton:GetChildren()) do
+						if v:IsA('BasePart') then
+							if v:FindFirstChild("Decal") then
+								v:FindFirstChild("Decal").Transparency = 1
+							end
+						end
+					end
+				else
+					buybutton.click.ClickDetector.MaxActivationDistance = 40
+					for i, v in pairs(buybutton:GetChildren()) do
+						if v:IsA('BasePart') then
+							if v:FindFirstChild("Decal") then
+								v:FindFirstChild("Decal").Transparency = 0
+							end
+						end
+					end
+
+					if buybuttonactive == false then
+						buybuttonactive = true
+
+						--Move buy button in front of equip button
+						local newbuypos = Vector3.new(408, 461.5, 560.45)
+						buybutton:SetPrimaryPartCFrame(CFrame.new(newbuypos) * CFrame.Angles(0, math.rad(-90), 0))
+
+						--Move equip button to default position
+						equipbutton:SetPrimaryPartCFrame(CFrame.new(defaultequippos) * CFrame.Angles(0, math.rad(-90), 0))
+
+						equipbuttonactive = false
+					end
+				end
+				
+				--Turn off equip button
+				equipbutton.click.ClickDetector.MaxActivationDistance = 0
+				for i, v in pairs(equipbutton:GetChildren()) do
+					if v:IsA('BasePart') then
+						if v:FindFirstChild("Decal") then
+							v:FindFirstChild("Decal").Transparency = 1
+						end
+					end
+				end
+			end
+			
+			--Makes current hat visible
+			hatinfo.hat.Transparency = 0
+		else
+			hatinfo.hat.Transparency = 1
+		end
+	end
+end
+
+local function leftclick()
+	currentindex = currentindex - 1
+	if currentindex < 1 then
+		currentindex = #hats
+	end
+	showhat(currentindex)
+end
+
+local function rightclick()
+	currentindex = currentindex + 1
+	if currentindex > #hats then
+		currentindex = 1
+	end
+	showhat(currentindex)
+end
+
+local function xclick()
+	--Reset Players Cam
+	cam.CameraType = Enum.CameraType.Custom
+	game.Workspace:FindFirstChild(player.Name).Humanoid.WalkSpeed = 16
+	
+	--Turn off all buttons
+	leftbutton.MaxActivationDistance = 0
+	rightbutton.MaxActivationDistance = 0
+	xbutton.MaxActivationDistance = 0
+	leftbutton.Parent.Decal.Transparency = 1
+	rightbutton.Parent.Decal.Transparency = 1
+	xbutton.Parent.Decal.Transparency = 1
+	hatshopdetect.MaxActivationDistance = 20
+	equipbutton.click.ClickDetector.MaxActivationDistance = 0
+	buybutton.click.ClickDetector.MaxActivationDistance = 0
+	if hatprice then
+		hatprice:Destroy()
+	end
+	
+	--turn all hat models invisible
+	for i, hatinfo in ipairs(hats) do
+		if i == currentindex then
+			hatinfo.hat.Transparency = 1
+		end
+	end
+	
+	--turn equip/buy button invisible
+	for i, v in pairs(equipbutton:GetChildren()) do
+		if v:IsA('BasePart') then
+			if v:FindFirstChild("Decal") then
+				v:FindFirstChild("Decal").Transparency = 1
+			end
+		end
+	end
+	for i, v in pairs(buybutton:GetChildren()) do
+		if v:IsA('BasePart') then
+			if v:FindFirstChild("Decal") then
+				v:FindFirstChild("Decal").Transparency = 1
+			end
+		end
+	end
+	
+	--reset index
+	currentindex = 1
+end
+
+local function buyclick()
+	local hat2buy = hats[currentindex].Name
+	buyhatremote:FireServer(hat2buy)
+	local playercash = player.leaderstats.Cash
+	local hatprice2 = tonumber(hats[currentindex].price)
+	if playercash.Value >= hatprice2 then
+		if hatprice then
+			hatprice:Destroy()
+		end
+		hatprice = Instance.new("Hint")
+		hatprice.Text = "Purchase Successful."
+		hatprice.Parent = playergui
+	end
+end
+
+local function equipclick()
+	local hat2equip = hats[currentindex].Name
+	equipremote:FireServer(hat2equip)
+	if hatprice then
+		hatprice:Destroy()
+	end
+	hatprice = Instance.new("Hint")
+	hatprice.Text = "Current hat equipped."
+	hatprice.Parent = playergui
+end
+
+hatshop.OnClientEvent:Connect(function()
+	cam.CameraType = Enum.CameraType.Scriptable
+	cam.CFrame = hatcam.CFrame
+	game.Workspace:FindFirstChild(player.Name).Humanoid.WalkSpeed = 0
+	leftbutton.MaxActivationDistance = 40
+	rightbutton.MaxActivationDistance = 40
+	xbutton.MaxActivationDistance = 40
+	leftbutton.Parent.Decal.Transparency = 0
+	rightbutton.Parent.Decal.Transparency = 0
+	hatshopdetect.MaxActivationDistance = 0
+	xbutton.Parent.Decal.Transparency = 0
+	
+	hats = {
+		{Name = "ArrowHat", hat = hatshophats:FindFirstChild("Arrow"), price = "300", display = "Price: 300"},
+		{Name = "FirefighterHelm", hat = hatshophats:FindFirstChild("FirefighterHelm"), price = "300", display = "Price: 300"},
+		{Name = "BlueBaseballCap", hat = hatshophats:FindFirstChild("BlueCap"), price = "600", display = "Price: 600"},
+		{Name = "StageProp", hat = hatshophats:FindFirstChild("StageProp"), price = "600", display = "Price: 600"},
+		{Name = "QuestionMark", hat = hatshophats:FindFirstChild("QuestionMark"), price = "800", display = "Price: 800"},
+		{Name = "Cloud", hat = hatshophats:FindFirstChild("Cloud"), price = "800", display = "Price: 800"},
+		{Name = "GotMilkVisor", hat = hatshophats:FindFirstChild("GotMilkVisor"), price = "800", display = "Price: 800"},
+		{Name = "Bucket", hat = hatshophats:FindFirstChild("Bucket"), price = "800", display = "Price: 800"},
+		{Name = "BlackNinjaMask", hat = hatshophats:FindFirstChild("BlackNinjaMask"), price = "1000", display = "Price: 1000"},
+		{Name = "PaperBag", hat = hatshophats:FindFirstChild("PaperBag"), price = "1000", display = "Price: 1000"},
+		{Name = "NethackBook", hat = hatshophats:FindFirstChild("NethackBook"), price = "1337", display = "Price: 1337"},
+		{Name = "FruitHat", hat = hatshophats:FindFirstChild("FruitHat"), price = "2000", display = "Price: 2000"},
+		{Name = "CrownofWarlords", hat = hatshophats:FindFirstChild("CrownofWarlords"), price = "5000", display = "Price: 5000"},
+		{Name = "SparkleTimeFedora", hat = hatshophats:FindFirstChild("STF"), display = "VIP Exclusive Hat"},
+		{Name = "HalloweenLampshade", hat = hatshophats:FindFirstChild("HalloweenLampshade"), price = "500", display = "Halloween Exclusive Price: 500"},
+	}
+	
+	-- Disconnect existing connections if they exist
+	if rightClickConnection then rightClickConnection:Disconnect() end
+	if leftClickConnection then leftClickConnection:Disconnect() end
+	if xClickConnection then xClickConnection:Disconnect() end
+	if buyClickConnection then buyClickConnection:Disconnect() end
+	if equipClickConnection then equipClickConnection:Disconnect() end
+
+	-- Set up new connections
+	rightClickConnection = rightbutton.MouseClick:Connect(rightclick)
+	leftClickConnection = leftbutton.MouseClick:Connect(leftclick)
+	xClickConnection = xbutton.MouseClick:Connect(xclick)
+	buyClickConnection = buybutton.click.ClickDetector.MouseClick:Connect(buyclick)
+	equipClickConnection = equipbutton.click.ClickDetector.MouseClick:Connect(equipclick)
+	
+	showhat(currentindex)
+end)
+

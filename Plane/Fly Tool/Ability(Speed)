@@ -1,0 +1,40 @@
+local tool = script.Parent
+local UIS= game:GetService("UserInputService")
+local cooldown = false
+
+local function activate()
+
+	local player = script.Parent.Parent.Name
+	local human = script.Parent.Parent:FindFirstChild("Humanoid")
+	local seat = human.Plane1.Seat
+	local speed = seat.Parent.Speed
+	local weapontype = game.Players:FindFirstChild(player).ShipUpgrades:FindFirstChild("Reload")
+
+	while true do
+		local userinput = UIS.InputBegan:Wait()
+		if userinput.UserInputType == Enum.UserInputType.Keyboard and userinput.KeyCode == Enum.KeyCode.T and cooldown == false then
+			if weapontype.Value == 1 then
+				print("speedboost1")
+				cooldown = true
+				speed.Value = 100
+				task.wait(5)
+				speed.Value = 60
+				task.wait(15)
+				cooldown = false
+			elseif weapontype.Value == 2 then
+				print("speedboost2")
+				cooldown = true
+				speed.Value = 150
+				task.wait(5)
+				speed.Value = 60
+				task.wait(15)
+				cooldown = false
+			end
+		else
+			return activate()
+		end
+	end
+end
+
+
+tool.Equipped:Connect(activate)

@@ -1,0 +1,26 @@
+local pet = script.Parent
+local event = game.ReplicatedStorage:FindFirstChild("messagegui")
+local message = "Quest pet collected!"
+
+pet.Touched:Connect(function(hit)
+	if hit.Parent ~= nil then
+		local humanoid = hit.Parent:FindFirstChild("Humanoid")
+		if humanoid then
+			local playername = hit.Parent.Name
+			local player = game.Players:FindFirstChild(playername)
+			if player then
+				local playermissions = player:FindFirstChild("Missions")
+				if playermissions then
+					local playerstats = playermissions:FindFirstChild("CatseyeQuest")
+					if playerstats.Value == 1 then
+						playerstats.Value = 2
+						event:FireClient(player, message)
+						pet:Destroy()
+					else
+						return
+					end
+				end
+			end
+		end
+	end
+end)

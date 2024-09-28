@@ -1,0 +1,16 @@
+local forcefieldremoteON = game.ReplicatedStorage.ForcefieldON
+
+local function fireforcefieldon(player, forcefieldeffect, forcefield)
+	local player = player
+	local forcefieldeffect = forcefieldeffect
+	local forcefield = forcefield
+	print(forcefieldeffect)
+	print(forcefield)
+	forcefieldeffect.Visible = true
+	forcefield.Value = 1
+	task.wait(20)
+	forcefieldeffect.Visible = false
+	forcefield.Value = 0
+end
+
+forcefieldremoteON.OnServerEvent:Connect(fireforcefieldon)

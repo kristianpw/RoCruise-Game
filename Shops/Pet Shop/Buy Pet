@@ -1,0 +1,91 @@
+--Serverside Script to prevent cheating
+local buypetremote = game.ReplicatedStorage:FindFirstChild("buypet")
+local selectremote = game.ReplicatedStorage:FindFirstChild("selectpet")
+local petprice
+
+local petprices = {
+	{Name = "Pet1", price = "300"},
+	{Name = "Pet2", price = "300"},
+	{Name = "Pet3", price = "600"},
+	{Name = "Pet4", price = "600"},
+	{Name = "Pet5", price = "1000"},
+	{Name = "Pet6", price = "1000"},
+	{Name = "Pet7", price = "2000"},
+	{Name = "Pet8", price = "4000"},
+	{Name = "Pet9", price = "1000"},
+	{Name = "Pet10", price = "2000"},
+	{Name = "Pet11", price = "2000"},
+	{Name = "Pet12", price = "4000"},
+	{Name = "Pet13"},
+	{Name = "Pet14"},
+}
+
+local function buypetfunc(player, pet)
+	local petprice = nil
+	for i, pets in ipairs(petprices) do
+		if pets.Name == pet then
+			petprice = tonumber(petprices[i].price)
+		end
+	end
+	local playerstats = game.Players:FindFirstChild(player.Name)
+	local playercash = playerstats.leaderstats.Cash
+	local petcheck = playerstats.Pets:FindFirstChild(pet)
+	local petowned = playerstats.FurnitureStorage:FindFirstChild("PetHouse")
+	local currentpet = playerstats.Pets:FindFirstChild("CurrentPet")
+	if playercash then
+		if playercash.Value >= petprice and petcheck.Value == 0 then
+			local base = game.Workspace:FindFirstChild("Room"..playerstats.Number.Value)
+			playercash.Value = playercash.Value - petprice
+			local petstat = playerstats.PlayerStats.PetsOwned
+			petstat.Value += 1
+			local spentstat = playerstats.PlayerStats.MoneySpent
+			spentstat.Value += petprice
+			petcheck.Value = 1
+			if petowned.Value == 1 then
+				local currentplayerspet = base.PetHouse:FindFirstChild("PlayerPet")
+				if currentplayerspet then
+					currentplayerspet:Destroy()
+				end
+			end
+			if petowned.Value == 0 then
+				petowned.Value = 1
+				local pethouse = base:FindFirstChild("PetHouse")
+				for i, v in pethouse:GetChildren() do
+					if v:IsA('BasePart') then
+						v.Transparency = 0
+						v.CanCollide = true
+					end
+				end
+			end
+			currentpet.Value = pet
+			local petclone = game.ReplicatedStorage.PlayerPets:FindFirstChild(pet):Clone()
+			local petspawn = base:FindFirstChild("PetSpawn")
+			petclone.Position = petspawn.Position
+			petclone.Parent = base:FindFirstChild("PetHouse")
+			petclone.Name = "PlayerPet"
+		end
+	end
+end
+
+local function selectpetfunc(player, pet)
+	local playerstats = game.Players:FindFirstChild(player.Name)
+	local petcheck = playerstats.Pets:FindFirstChild(pet)
+	if petcheck.Value == 1 then
+		local base = game.Workspace:FindFirstChild("Room"..playerstats.Number.Value)
+		local currentplayerspet = base.PetHouse:FindFirstChild("PlayerPet")
+		if currentplayerspet then
+			currentplayerspet:Destroy()
+		end
+		local currentpet = playerstats.Pets:FindFirstChild("CurrentPet")
+		currentpet.Value = pet
+		
+		local petclone = game.ReplicatedStorage.PlayerPets:FindFirstChild(pet):Clone()
+		local petspawn = base:FindFirstChild("PetSpawn")
+		petclone.Position = petspawn.Position
+		petclone.Parent = base:FindFirstChild("PetHouse")
+		petclone.Name = "PlayerPet"
+	end
+end
+
+buypetremote.OnServerEvent:Connect(buypetfunc)
+selectremote.OnServerEvent:Connect(selectpetfunc)

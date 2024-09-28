@@ -1,0 +1,94 @@
+local tool = script.Parent
+local player = game.Players.LocalPlayer
+local mouse = player:GetMouse()
+local UIS = game:GetService("UserInputService")
+local runservice = game:GetService("RunService")
+
+local moving = false
+local max = 100000
+local speed = 60
+
+local function getplaneseat()
+	local player = tool.Parent
+	local human = player:FindFirstChild("Humanoid")
+	if human then
+		local seat = player.Humanoid.SeatPart
+		if seat:IsA('BasePart') then
+			local main = seat.Parent:FindFirstChild("Main")
+			return main
+		end
+		return nil
+	end
+end
+
+local function toggleanchor(plane, anchored)
+	local player = tool.Parent
+	local seat = player.Humanoid.SeatPart
+	seat.Anchored = anchored
+	
+	local bodyvelocity = seat.Parent:FindFirstChild("Main"):FindFirstChild("BodyVelocity")
+	bodyvelocity.MaxForce = Vector3.new(0,0,0)
+	--bodyvelocity.Velocity = Vector3.new(0,0,0)
+	
+	local bodygyro = seat.Parent:FindFirstChild("Main"):FindFirstChild("BodyGyro")
+	bodygyro.MaxTorque = Vector3.new(0,0,0)
+end
+
+local function findangle(posA, posB)
+	local cframe = CFrame.new(posA, posB)
+	local targetx, targety, targetz =  cframe:ToEulerAnglesXYZ()
+	local finalangle = CFrame.Angles(targetx, targety, targetz)
+	return finalangle
+end
+
+local function moveplane(plane)
+	toggleanchor(plane, false)
+	local seat = getplaneseat()
+	
+	local bodyvelocity = seat:FindFirstChild("BodyVelocity")
+	bodyvelocity.MaxForce = Vector3.new(max, max, max)
+	
+	local bodygyro = seat:FindFirstChild("BodyGyro")
+	bodygyro.MaxTorque = Vector3.new(max, max, max)
+	
+	task.wait(0.1)
+end
+
+mouse.Button1Down:Connect(function()
+	moving = true
+	local seat = getplaneseat()
+	if seat then
+		
+		local speedValue = seat.Parent:FindFirstChild("Speed")
+		if speedValue then
+			speed = speedValue.Value
+			speedValue.Changed:Connect(function(newSpeed)
+				speed = newSpeed
+			end)
+		end
+		
+		local bodyvelocity = seat:FindFirstChild("BodyVelocity")
+		local bodygyro = seat:FindFirstChild("BodyGyro")
+		runservice.RenderStepped:Connect(function()
+			if moving then
+				local mousepos = mouse.Hit.Position
+				
+				
+				moveplane(seat)
+				
+				bodyvelocity.Velocity = seat.CFrame.RightVector * speed
+				bodygyro.CFrame = CFrame.new(seat.Position, mousepos) * CFrame.Angles(0, math.rad(90), 0)
+				local aav = seat.CFrame:VectorToObjectSpace(seat.AssemblyAngularVelocity)
+				bodygyro.CFrame *= CFrame.Angles(-math.rad(aav.Y)*20, 0, 0)
+			end
+		end)
+	else
+		warn("warning")
+	end
+end)
+
+mouse.Button1Up:Connect(function()
+	local plane = getplaneseat()
+	toggleanchor(plane, true)
+	moving = false
+end)

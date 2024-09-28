@@ -1,0 +1,162 @@
+local model = script.Parent
+local event = model.event
+local water = game.ReplicatedStorage.watertween
+local script1 = game.ReplicatedStorage.watersprayscript1
+local script2 = game.ReplicatedStorage.watersprayscript2
+local script3 = game.ReplicatedStorage.watersprayscript3
+local players = game:GetService("Players")
+local tweenservice = game:GetService("TweenService")
+local tweeninfo = TweenInfo.new(45, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
+local roomdetect = model.roomdetect
+local holesfixed = model.holesfixed
+
+local holes = {
+	model.hole1,
+	model.hole2,
+	model.hole3,
+	model.hole4,
+	model.hole5,
+	model.hole6,
+	model.hole7,
+	model.hole8,
+	model.hole9,
+	model.hole10,
+	model.hole11,
+	model.hole12,
+}
+
+local holesarray = {}
+
+local Touchtable = {}
+
+roomdetect.Touched:Connect(function(object)
+	if object.Name ~= "water" then
+		if object.Parent:FindFirstChild("Humanoid") then
+			local character = object.Parent
+			if not table.find(Touchtable, character) then
+				table.insert(Touchtable, character)
+				print(Touchtable)
+			end
+		end
+	end
+end)
+
+roomdetect.TouchEnded:Connect(function(object)
+	if object.Name ~= "water" then
+		if object.Parent:FindFirstChild("Humanoid") then
+			local character = object.Parent
+			if table.find(Touchtable, character) then
+				table.remove(Touchtable, table.find(Touchtable, character))
+				print(Touchtable)
+			end
+		end
+	end
+end)
+
+
+local function flooding()
+	if event.Value == 1 then
+		local waterclone = water:Clone()
+		waterclone.Parent = game.Workspace
+		local newpos = water.Position + Vector3.new(0,15,0)
+		local watertween = tweenservice:Create(waterclone, tweeninfo, {Position = newpos})
+		local rng1 = math.random(1,3)
+		local rng2 = math.random(4,6)
+		local rng3 = math.random(7,9)
+		local rng4 = math.random(10,12)
+		holesarray = {
+			holes[rng1],
+			holes[rng2],
+			holes[rng3],
+			holes[rng4]
+		}
+		for i, player in pairs(players:GetChildren()) do
+			if player.Misc.Job.Value == 5 then
+				local gui = player.PlayerGui:FindFirstChild("MessageGui")
+				local text = gui:FindFirstChild("TextLabel")
+				gui.Enabled = true
+				text.Text = "The generator room is flooding! Patch the holes, quickly!"
+				task.wait(4)
+				gui.Enabled = false
+			end
+		end
+		for _, hole in ipairs(holesarray) do
+			local s1 = script1:Clone()
+			local s2 = script2:Clone()
+			local s3 = script3:Clone()
+			hole.Transparency = 0
+			
+			local fixed = hole.fixed
+			fixed.Value = 3
+
+			s1.Parent = hole
+			s2.Parent = hole
+			s3.Parent = hole
+		end
+		
+		watertween:Play()
+		
+		holesfixed.changed:Connect(function()
+			if holesfixed.Value == 12 then
+				watertween:Pause()
+				for i, player in pairs(players:GetChildren()) do
+					if player.Misc.Job.Value == 5 then
+						local gui = player.PlayerGui:FindFirstChild("MessageGui")
+						local text = gui:FindFirstChild("TextLabel")
+						gui.Enabled = true
+						text.Text = "The pipes were fixed! The generator room won't flood."
+						task.wait(4)
+						gui.Enabled = false
+					end
+				end
+				task.wait(5)
+				waterclone:Destroy()
+				event.Value = 0
+				holesfixed.Value = 0
+				return
+			end
+		end)
+		
+		watertween.Completed:Connect(function()
+			for i, player in pairs(players:GetChildren()) do
+				if player.Misc.Job.Value == 5 then
+					local gui = player.PlayerGui:FindFirstChild("MessageGui")
+					local text = gui:FindFirstChild("TextLabel")
+					gui.Enabled = true
+					text.Text = "Oh no! The generator room flooded..."
+					task.wait(4)
+					gui.Enabled = false
+				end
+			end
+			waterclone:Destroy()
+			for i, holes in pairs(holesarray) do
+				local waterscript1 = holes:FindFirstChild("watersprayscript1")
+				local waterscript2 = holes:FindFirstChild("watersprayscript2")
+				local waterscript3 = holes:FindFirstChild("watersprayscript3")
+				if waterscript1 ~= nil then
+					waterscript1:Destroy()
+				end
+				if waterscript2 ~= nil then
+					waterscript2:Destroy()
+				end
+				if waterscript3 ~= nil then
+					waterscript3:Destroy()
+				end
+				if holes.Transparency ~= 1 then
+					holes.Transparency = 1
+				end
+			end
+			
+			for i, players in pairs(Touchtable) do
+				print(players)
+				local human = game.Workspace:FindFirstChild(players.Name).Humanoid
+				human.Health = 0
+			end
+			event.Value = 0
+			holesfixed.Value = 0
+		end)
+		
+	end
+end
+
+event.Changed:Connect(flooding)

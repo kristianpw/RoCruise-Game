@@ -1,0 +1,53 @@
+local tool = script.Parent
+local UIS= game:GetService("UserInputService")
+local wep0fired = game.ReplicatedStorage:FindFirstChild("Wep0Fired")
+local wep1fired = game.ReplicatedStorage:FindFirstChild("Wep1Fired")
+local wep2fired = game.ReplicatedStorage:FindFirstChild("Wep2Fired")
+local wep3fired = game.ReplicatedStorage:FindFirstChild("Wep3Fired")
+local cooldown = false
+
+local function activate()
+	local player = script.Parent.Parent.Name
+	local human = script.Parent.Parent:FindFirstChild("Humanoid")
+	local seat = human.Plane1.Seat
+	local flameshoot1 = seat.Parent.Weapons.Wep2Right
+	local flameshoot2 = seat.Parent.Weapons.Wep2Left
+	local sparkleshoot1 = seat.Parent.Weapons.LazerLeft
+	local sparkleshoot2 = seat.Parent.Weapons.LazerRight
+	local diamantshoot1 = seat.Parent.Weapons.Wep1Right
+	local diamantshoot2 = seat.Parent.Weapons.Wep1Left
+	local baseshoot1 = seat.Parent.Weapons.Wep0Right
+	local baseshoot2 = seat.Parent.Weapons.Wep0Left
+	local weapontype = game.Players:FindFirstChild(player).ShipUpgrades:FindFirstChild("ReloadB")
+	while true do
+	local userinput = UIS.InputBegan:Wait()
+		if userinput.UserInputType == Enum.UserInputType.Keyboard and userinput.KeyCode == Enum.KeyCode.F and cooldown == false then
+			if weapontype.Value == 3 then
+				cooldown = true
+				wep3fired:FireServer(flameshoot1, flameshoot2)
+				task.wait(0.1)
+				cooldown = false
+			elseif weapontype.Value == 2 then
+				cooldown = true
+				wep2fired:FireServer(sparkleshoot1, sparkleshoot2)
+				task.wait(0.1)
+				cooldown = false
+			elseif weapontype.Value == 1 then
+				cooldown = true
+				wep1fired:FireServer(diamantshoot1, diamantshoot2)
+				task.wait(0.1)
+				cooldown = false
+			elseif weapontype.Value == 0 then
+				cooldown = true
+				wep0fired:FireServer(baseshoot1, baseshoot2)
+				task.wait(0.1)
+				cooldown = false
+			end
+		else
+		return activate()
+		end
+	end
+end
+
+
+tool.Equipped:Connect(activate)
